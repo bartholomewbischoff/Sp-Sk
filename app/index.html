@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="SpectreSkyfall" >
+  <head>
+    <title>S P E C T R E</title>
+
+    <!-- <link rel="shortcut icon" type="image/png" href="favicon.ico" /> -->
+
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html"; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
+    <link rel="stylesheet" href="../node_modules/angular-material/angular-material.css"/>
+    <link rel="stylesheet" href="assets/app.css"/>
+    <link rel="stylesheet" href="../node_modules/openlayers/css/ol.css" />
+    <link rel="stylesheet" href="../node_modules/angular-intro.js/introjs.css" />
+
+    <style type="text/css">
+        /**
+         * Hide when Angular is not yet loaded and initialized
+         */
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+          display: none !important;
+        }
+    </style>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="./src/scrollbox.js"></script>
+
+    <script src="../node_modules/angular/angular.js"></script>
+    <script src="../node_modules/angular-animate/angular-animate.js"></script>
+    <script src="../node_modules/angular-aria/angular-aria.js"></script>
+    <script src="../node_modules/openlayers/build/ol-custom.js"></script>
+    <script src="../node_modules/angular-material/angular-material.js"></script>
+    <script src="../node_modules/angular-intro.js/intro.js"></script>
+    <script src="../node_modules/angular-intro.js/angular-intro.js"></script>
+
+    <script src="./src/Main/MainController.js"></script>
+    <script src="./src/Main/DefaultConfigs.js"></script>
+    <script src="./src/Main/MapService.js"></script>
+    <script src="./src/index.js"></script>
+
+    <!-- <script src="http://openlayers.org/en/v3.18.2/build/ol.js"></script> -->
+
+  </head>
+
+  <body ng-cloak layout="column" ng-controller="MainController as ctrl" >
+
+    <!-- Container #1 - Main container on app -->
+    <div flex layout="column" ng-intro-options="HelpOptions" ng-intro-method="CallMe" ng-intro-autostart="false">
+
+      <section layout="column" flex>
+
+        <!-- SideNav for Help Options -->
+        <md-sidenav md-component-id="helpnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
+
+          <md-toolbar layout="row">
+            <h1 class="md-toolbar-tools">Help Options</h1>
+          </md-toolbar>
+        
+          <md-content layout-padding>
+            <md-list>
+            
+              <md-list-item >
+                <md-button ng-click="ctrl.helpOverlayIntro()">
+                  <md-icon md-svg-icon="livehelp" class="avatar"></md-icon>
+                  {{ data.selectedApp.name }} Tutorial
+                </md-button>
+              </md-list-item>
+
+              <md-list-item >
+                <md-button ng-click="ctrl.phenomHelpOptions()">
+                  <md-icon md-svg-icon="satellite" class="avatar"></md-icon>
+                  Phenomenology Tutorial
+                </md-button>
+              </md-list-item>
+
+              <md-list-item >
+                <md-button ng-click="ctrl.infoPanel()">
+                  <md-icon md-svg-icon="info" class="avatar"></md-icon>
+                  About {{ data.selectedApp.name }}
+                </md-button>
+              </md-list-item>
+
+            </md-list>
+          </md-content>
+
+        </md-sidenav>
+
+        <!-- SideNav for Filter Options -->
+        <md-sidenav md-component-id="filternav" class="filternav md-sidenav-right md-whiteframe-z2 md-closed">
+          
+          <md-toolbar layout="row">
+            <h1 class="md-toolbar-tools">Filter Options</h1>
+            <md-button class="menuButton" ng-click="ctrl.filterHelpOverlayIntro()" aria-label="Show filter List" style="margin-right: 0px; margin-left: auto;">
+              <md-icon md-svg-icon="help" ></md-icon>
+            </md-button>
+          </md-toolbar>
+
+          <md-content flex layout-padding>
+            <form ng-submit="submit()">
+                
+                <!-- Sensor Option -->
+                <div class="control">
+                    <h2>Sensor</h2>
+                    <md-radio-group layout="row" ng-model="data.defaultSatelliteOption" style="margin-left:10px;" class="filterstep1">
+                        <md-radio-button ng-repeat="sats in data.availableSensors"
+                            ng-value="sats.id"
+                            ng-disabled=" sats.isDisabled " >
+                        {{ sats.name }}<br/>
+                    </md-radio-group>
+                </div>
+                
+                <!-- AOI Option -->
+                <div layout="column" ng-if="data.selectedApp.id == 2">
+                  <h2>AOI</h2>
+                  <md-input-container flex="80" style="margin-left:10px; width:300px;" class="filterstep2">
+                    <label>Area</label>
+                    <md-select name="aoi" ng-model="data.defaultAOI" required>
+                      <md-option>None</md-option>
+                      <md-option ng-repeat="area in data.availableAois" ng-value="area.id" ng-disabled="area.isDisabled">
+                        {{area.name}}
+                      </md-option>
+                    </md-select>
+                  </md-input-container>
+                </div>
+
+                <!-- Date/Time Option -->
+                <div layout="column">
+                  <h2>Date/Time</h2>
+                  
+                  <div class="filterstep3">
+                    <md-checkbox style="margin-left:10px;" ng-checked="" ng-model="data.liveFeedSelected" ng-click="" aria-label="Live Feed Option">
+                      Live Feed
+                    </md-checkbox>
+
+                    <div layout="row" ng-if="!data.liveFeedSelected">
+                        <md-input-container layout='row'>
+                            <label>Enter date</label>
+                            <md-datepicker ng-model="data.defaultDate" name="dateField" ></md-datepicker>
+                        </md-input-container>
+                        <span flex>  </span>
+                        <md-input-container>
+                            <label>Enter time</label>
+                            <input type="time" name="usr_time" value="13:00">
+                        </md-input-container>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Time Back Option -->
+                <div class="control">
+                    <h2>Time Back</h2>
+                    <md-input-container flex="80" style="margin-left:10px; width:300px;" class="filterstep4">
+                      <label>Time Back</label>
+                      <md-select name="delta" ng-model="data.defaultDelta" required>
+                        <md-option ng-repeat="delta in data.validDeltas" ng-value="delta.id" ng-disabled="delta.isDisabled">
+                          {{delta.name}}
+                        </md-option>
+                      </md-select>
+                    </md-input-container>
+                </div>
+
+                <md-button class="md-raised filterstep5" ng-click="ctrl.toggle('filternav')" type="button">Apply</md-button>
+
+            </form>
+          </md-content>
+          
+        </md-sidenav>
+
+        <!-- SideNav for Algorithm Options -->
+        <md-sidenav md-component-id="algonav" class="md-sidenav-left md-whiteframe-z2 md-closed" >
+          
+          <!-- Container #5 - top row of Container #3 -->
+          <md-toolbar layout="row">
+            <h1 class="md-toolbar-tools">Algorithms</h1>
+            <md-button class="algoButton menuButton" ng-click="ctrl.algoHelpOverlayIntro()" aria-label="Show Algorithm List" style="margin-right: 0px; margin-left: auto;">
+              <md-icon md-svg-icon="help" ></md-icon>
+            </md-button>
+          </md-toolbar>
+
+          <md-content>
+            <md-list>
+              <md-list-item class="algostep1">
+                <md-button ng-click="ctrl.hemiMenu()">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  HEMI Chip and Stitch
+                </md-button>
+              </md-list-item>
+            
+              <md-list-item class="algostep2">
+                <md-button ng-click="ctrl.monsoonMenu()">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  Monsoon
+                </md-button>
+              </md-list-item>
+            
+              <md-list-item class="algostep3">
+                <md-button ng-click="ctrl.arapahoMenu()">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  Arapaho
+                </md-button>
+              </md-list-item>
+            
+              <md-list-item class="algostep4">
+                <md-button ng-click="ctrl.stereoMenu()">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  Stereo Cloud Top Altitude
+                </md-button>
+              </md-list-item>
+
+              <md-list-item class="algostep5">
+                <md-button ng-click="ctrl.giftMenu()">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  GIFT
+                </md-button>
+              </md-list-item>
+
+              <md-list-item class="algostep6">
+                <md-button ng-click="ctrl.gossMenu()">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  GOSS/SuperGOSS
+                </md-button>
+              </md-list-item>
+            </md-list>
+          </md-content>
+          
+        </md-sidenav>
+
+        <!-- SideNav for Phenomenology List -->
+        <md-sidenav md-component-id="phenomnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
+          
+          <md-toolbar layout="row">
+            <h1 class="md-toolbar-tools">About</h1>
+            <md-button class="menuButton" ng-click="ctrl.toggle('phenomnav')" aria-label="Show Phenomenology Examples List" style="margin-right: 0px; margin-left: auto;">
+              <md-icon md-svg-icon="help" ></md-icon>
+            </md-button>
+          </md-toolbar>
+
+          <md-content>
+            <md-list>
+              <md-list-item >
+                <md-button ng-click="">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  Example 1
+                </md-button>
+              </md-list-item>
+            
+              <md-list-item >
+                <md-button ng-click="">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  Example 2
+                </md-button>
+              </md-list-item>
+            
+              <md-list-item >
+                <md-button ng-click="">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  Example 3
+                </md-button>
+              </md-list-item>
+            
+              <md-list-item >
+                <md-button ng-click="">
+                  <md-icon md-svg-icon="menu" class="avatar"></md-icon>
+                  Example 4
+                </md-button>
+              </md-list-item>
+            </md-list>
+          </md-content>
+          
+        </md-sidenav>
+
+        <!-- SideNav for Info List -->
+        <md-sidenav md-component-id="infonav" class="infonav md-sidenav-right md-whiteframe-z2 md-closed">
+          
+          <md-toolbar layout="row">
+            <h1 class="md-toolbar-tools">About</h1>
+          </md-toolbar>
+
+          <md-content>
+            <div layout="row" style="margin: 10px 5px 10px 5px;">
+              <img src="./assets/images/af.png" class="logo" title="United States Air Force" style="margin-left: 0px; margin-right: auto;"/>
+              <img ng-if="data.selectedApp.id == 1" src="./assets/images/spectre.png" class="logo-spectre" title="Spectre" style="margin-left: auto; margin-right: auto;/>
+              <img ng-if="data.selectedApp.id == 2" src="./assets/images/skyfall-cornflower2.png" class="logo-spectre" title="Skyfall" height="26" style="margin-left: auto; margin-right: auto;"/>
+              <img src="./assets/images/nasic.png" class="logo" title="NASIC" style="margin-left: auto; margin-right: 0px;"/>
+            </div>
+
+            <div style="margin: 10px 5px 10px 5px;">
+              <p>
+                For questions, comments, and suggestions, please contact NASIC/GSP at
+                <a href="mailto:spectre@nasic.wrightpatterson.af.smil.mil">spectre@nasic.wrightpatterson.af.smil.mil</a>
+              </p>
+
+              <h1>Release Notes</h1>
+              <div>
+                <h2 style="margin-left: 10px;">Version 2.0</h2>
+                <p style="margin-left: 20px;">2016-10-31</p>
+                <ul style="margin-left: 30px;">
+                    <li>Contact Information</li>
+                </ul>
+              </div>
+            </div>
+          </md-content>
+          
+        </md-sidenav>
+
+        <!-- Top Classification Bar -->
+        <md-toolbar layout="row"  layout-align="start center" class="md-primary md-hue-2 classification1">
+          <div class="text1" style="margin-right: auto; margin-left: auto;"> {{ data.classificationText }} </div>
+        </md-toolbar>
+
+        <!-- Container #2 - Top toolbar in Container #1 -->
+        <md-toolbar layout="row"  layout-align="start center" class="md-primary md-hue-2">
+
+          <!-- Trigger element for Algorithm menu -->
+          <md-button class="menuButton step1" ng-click="ctrl.toggle('algonav')" aria-label="Show Algorithm List" style="margin-left: 0px;">
+            <md-icon md-svg-icon="algo" ></md-icon>
+          </md-button>
+
+          <!-- Trigger element for Filter menu -->
+          <md-button class="menuButton step2" ng-click="ctrl.toggle('filternav')" aria-label="Show Filter Options" style="margin-right: 0px; margin-left: auto;">
+            <md-icon md-svg-icon="filter" ></md-icon>
+          </md-button>
+
+          <!-- Button to open the help options sidenav -->
+          <md-button ng-click="ctrl.toggle('helpnav')" class="menuButton md-primary" aria-label="Open Help Overlay" style="margin-right: 0px;">
+            <md-icon md-menu-origin md-svg-icon="help"></md-icon>
+          </md-button>
+
+        </md-toolbar>
+        
+        <!-- Container #3 - Content holder in Container #1 -->
+        <md-content flex id="content">
+          
+          <!-- Container #4 - map holder in Container #3 -->
+          <div class="map" id="map" style="background-color:black">
+
+            <!-- Container #5 - toolbar at top of Container #3 -->
+            <md-toolbar layout="row" layout-align="start center" class="md-primary">
+              <!-- Controls that create a product -->
+              <div class="productControls" layout="row">
+
+                <!-- Button to create movie -->
+                <md-button ng-click="" class="menuButton md-primary mapFirst" aria-label="Create movie" style="margin-right: 0px; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="movie"></md-icon>
+                </md-button>
+
+                <!-- Button to take image -->
+                <md-button ng-click="" class="menuButton md-primary mapFirst" aria-label="Create image" style="margin-right: auto; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="photo"></md-icon>
+                </md-button>
+
+              </div>
+
+              <!-- Controls that handle which image is shown -->
+              <div class="playControls" layout="row">
+
+                <!-- Button to goto first image -->
+                <md-button ng-click="ctrl.startOption()" class="menuButton md-primary mapFirst" aria-label="First image control" style="margin-right: 0px; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="firstpagearrow"></md-icon>
+                </md-button>
+
+                <!-- Button to go back one image -->
+                <md-button ng-click="ctrl.backwardOption()" class="menuButton md-primary mapBack" aria-label="Left image control" style="margin-right: 0px; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="leftarrow"></md-icon>
+                </md-button>
+
+                <!-- Button to control play of images -->
+                <md-button ng-if="playStatus" ng-click="ctrl.playOption()" class="menuButton md-primary mapPlay" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="playarrow"></md-icon>
+                </md-button>
+
+                <!-- Button to stop play of images -->
+                <md-button ng-if="!playStatus" ng-click="ctrl.stopOption()" class="menuButton md-primary mapStop" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="stop"></md-icon>
+                </md-button>
+
+                <!-- Button to go forward one image -->
+                <md-button ng-click="ctrl.forwardOption()" class="menuButton md-primary mapFwd" aria-label="Right image control" style="margin-right: 0px; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="rightarrow"></md-icon>
+                </md-button>
+
+                <!-- Button to go to last image -->
+                <md-button ng-click="ctrl.endOption()" class="menuButton md-primary mapLast" aria-label="Last image control" style="margin-right: 0px; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="lastpagearrow"></md-icon>
+                </md-button>
+
+              </div>
+
+              <!-- Controls that handle options for the images -->
+              <div class="optionControls" layout='row'>
+                
+              </div>
+
+            </md-toolbar>
+
+            <!-- Bottom Classification Bar -->
+            <md-toolbar layout="row"  layout-align="start center" class="md-primary md-hue-2 classification1 mapClass">
+              <div class="text1" style="margin-right: auto; margin-left: auto;"> {{ data.classificationText }} </div>
+            </md-toolbar> 
+
+          </div>
+          
+        </md-content>
+
+      </section>
+
+    </div>
+
+  </body>
+
+</html>

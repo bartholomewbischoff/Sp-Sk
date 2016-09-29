@@ -1,0 +1,257 @@
+html, body {
+  font-family: 'Roboto', sans-serif;
+  font-size:14px;
+  height:100%;
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden !important;
+}
+
+.text1 {
+  font-size: 9.5px;
+  font-weight: bold;
+}
+
+/* Toolbar area ------------------------------------------------*/
+
+.menuButton {
+  background-color: transparent;
+  border: none;
+  height: 38px;
+  margin: 16px;
+  width: 36px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.control {
+  padding-bottom: 40px;
+}
+
+md-menu-item .md-button {
+  color: white;
+}
+
+md-toolbar .filtmenu {
+  margin-right: 0px;
+  margin-left: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+md-toolbar h3 {
+  margin: auto;
+  font-weight: 500;
+}
+
+md-toolbar form {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: 10px;
+}
+
+md-toolbar.classification1 {
+  background-color: darkgreen !important;
+  border: 2px solid green;
+  min-height: 16px !important;
+}
+
+md-toolbar.classification2 {
+  background-color: darkred !important;
+  border: 2px solid red;
+  min-height: 16px !important;
+}
+
+md-toolbar .search input {
+  border: none;
+  outline: none;
+  margin-left: 10px;
+  background-color: rgb(85, 161, 216);
+}
+
+.productControls {
+  width: 33%;
+  margin-right: auto; 
+  margin-left: 0px;
+} 
+
+.playControls {
+  width: 33%;
+  margin-right: auto; 
+  margin-left: auto;
+} 
+
+.optionControls {
+  width: 33%;
+  margin-right: 0px; 
+  margin-left: auto;
+}
+
+.scroll-text {
+    border: 1px solid red;
+    width: 400px;
+    height: 4.5em;
+    overflow: hidden;
+}
+
+/* Sidenav area ---------------------------------------------------*/
+
+md-list-item > button {
+  width: 100%;
+  text-align: left !important;
+}
+
+md-sidenav  md-list {
+  padding: 0px 0px 8px 0px;
+  overflow: hidden;
+}
+
+.filternav {
+  width: 450px;
+}
+
+.infonav {
+  width: 450px;
+}
+
+
+/* Primary content area -----------------------------------------------*/
+
+#content {
+  overflow: hidden;
+  background-color: black;
+}
+
+#content .md-button.share {
+  background-color: transparent;
+  border: none;
+  width: 48px;
+  height: 48px;
+  margin: 8px auto 16px 0;
+  position: absolute;
+  top: 10px;
+  right: 25px;
+}
+
+#content .md-button.share > md-icon {
+  fill:black;
+  width: 36px;
+  height: 36px;
+}
+
+md-button.menuBtn > md-icon {
+  fill:white;
+  width: 24px;
+  height: 24px;
+}
+
+#content .md-button.share:active > md-icon {
+  background-color: #dadada;
+  border-radius: 75%;
+  padding: 4px;
+  transition: all 100ms ease-out 30ms;
+}
+
+#content #map {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#content img {
+  display: block;
+  margin : auto;
+  height: auto;
+  width: auto;
+  max-height: 100% !important;
+  max-width: 100%;
+}
+
+/* Utils -----------------------------------------------------------------*/
+
+.content-wrapper {
+  position: relative;
+}
+
+md-toolbar h1 {
+  font-size: 1.250em;
+  font-weight: 400;
+}
+
+md-bottom-sheet  md-icon {
+  margin-right: 20px;
+}
+
+span.name {
+  font-weight: bold;
+  font-size: 1.75em;
+  padding-left: 5px;
+}
+
+md-dialog-content {
+  padding: 10px 10px 10px 10px;
+}
+
+.helpoverlay {
+  display: none;
+}
+
+/* Openlayers CSS -------------------------------------------------- */
+
+.map:fullscreen {
+  height: 100%;
+}
+
+.map:-moz-full-screen {
+  height: 100%;
+}
+
+.map:-webkit-full-screen {
+  height: 100%;
+}
+
+.ol-rotate {
+  margin-top: 163px;
+  left:.5em;
+  right: auto !important;
+}
+
+.mapClass {
+  position: absolute;
+  bottom: 0px; 
+  z-index: 10000;
+}
+
+.rotate-90 {
+  top: 65px;
+  left: .5em;
+}
+
+.ol-touch .rotate-90 {
+  top: 80px;
+}
+
+.rotate-180 {
+  top: 100px;
+  left: .5em;
+}
+
+.ol-touch .rotate-180 {
+  top: 120px;
+}
+
+.rotate-270 {
+  top: 135px;
+  left: .5em;
+}
+
+.ol-touch .rotate-270 {
+  top: 160px;
+}
+
+.ol-control.rotate-90>button, .ol-control.rotate-180>button, .ol-control.rotate-270>button {
+  font-size: xx-small;
+  width: 21.94px;
+  height: 21.94px;
+}

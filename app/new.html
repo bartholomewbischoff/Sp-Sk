@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="SpectreSkyfall" >
+  <head>
+    <title>S P E C T R E</title>
+
+    <!-- <link rel="shortcut icon" type="image/png" href="favicon.ico" /> -->
+
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html"; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
+    <link rel="stylesheet" href="../node_modules/angular-material/angular-material.css"/>
+    <link rel="stylesheet" href="assets/app.css"/>
+
+    <style type="text/css">
+        /**
+         * Hide when Angular is not yet loaded and initialized
+         */
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+          display: none !important;
+        }
+
+        .scroll-text {
+            border: 1px solid red;
+            width: 400px;
+            height: 4.5em;
+            overflow: hidden;
+        }
+
+        .scroll-img {
+            border: 1px solid red;
+            width: 400px;
+            height: 50px;
+            overflow: hidden;
+        }
+    </style>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="./src/scrollbox.js"></script>
+
+    <script src="../node_modules/angular/angular.js"></script>
+    <script src="../node_modules/angular-animate/angular-animate.js"></script>
+    <script src="../node_modules/angular-aria/angular-aria.js"></script>
+    <script src="../node_modules/openlayers/build/ol-custom.js"></script>
+    <script src="../node_modules/angular-material/angular-material.js"></script>
+    <script src="../node_modules/angular-intro.js/intro.js"></script>
+    <script src="../node_modules/angular-intro.js/angular-intro.js"></script>
+
+    <script src="./src/Main/MainController.js"></script>
+    <script src="./src/Main/DefaultConfigs.js"></script>
+    <script src="./src/Main/MapService.js"></script>
+    <script src="./src/index.js"></script>
+
+    <!-- <script src="http://openlayers.org/en/v3.18.2/build/ol.js"></script> -->
+
+  </head>
+
+  <body ng-cloak layout="column" ng-controller="MainController as ctrl" >
+
+    <div id="demo" class="scroll-img">
+        <ul>
+            <li>
+                <p>1</p>
+            </li>
+            <li>
+                <p>2</p>
+            </li>
+            <li>
+                <p>3</p>
+            </li>
+            <li>
+                <p>4</p>
+            </li>
+            <li>
+                <p>5</p>
+            </li>
+            <li>
+                <p>6</p>
+            </li>
+            <li>
+                <p>7</p>
+            </li>
+            <li>
+                <p>8</p>
+            </li>
+            <li>
+                <p>9</p>
+            </li>
+        </ul>
+    </div>
+
+  </body>
+
+</html>
