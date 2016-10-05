@@ -1,3 +1,11 @@
+10/7/2016
+-------------------------------------------------------
+	- added satellite location icon to open angular toast
+	- added angular material toast element linked to satellite icon
+	- embedded d3 based rotating earth in toast element
+	- corrected positioning of elements in the map controls toolbar
+	- 
+
 9/30/2016
 -------------------------------------------------------
 	- added help tutorial to the algorithm sidenav
