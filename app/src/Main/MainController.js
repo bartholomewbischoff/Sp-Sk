@@ -1,13 +1,34 @@
 angular
   .module('main', ['ngMaterial'])
-  .controller('MainController', function($scope, $mdDialog, $mdSidenav, DefaultConfigs, MapService) {
+  .controller('MainController', function($scope, $mdDialog, $mdSidenav, $mdToast, DefaultConfigs, MapService) {
     var originatorEv
     var currentImages = [1, 2, 3, 4, 5];
+    var isDlgOpen;
 
     $scope.data = DefaultConfigs;
     $scope.ind = 0;
     $scope.playStatus = true;
     $scope.HelpOptions = $scope.MainIntroOptions;
+
+    // creates a toast to hold the satellite location info
+    $scope.showSatelliteToast = function() {
+        $mdToast.show({
+          hideDelay   : 100000,
+          position    : 'bottom left',
+          controller  : 'MainController',
+          templateUrl : 'satelliteToast.html'
+        });
+    };
+    // controls the opening and closing of the satellite toast
+    $scope.closeSatelliteToast = function() {
+        if (isDlgOpen) return;
+
+        $mdToast
+          .hide()
+          .then(function() {
+            isDlgOpen = false;
+          });
+    };
 
     // initialize the openlayers map
     var initializeMap = function(target = 'map') {  

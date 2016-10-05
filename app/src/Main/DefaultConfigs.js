@@ -64,7 +64,7 @@ angular
                 'livefeed': true,
                 'x': 4096,
                 'y': 4096,
-                'zoom': 1,
+                'zoom': 2,
                 'idx': 0
             },
 

@@ -5,6 +5,10 @@ angular
         $mdIconProvider
             .defaultIconSet("./assets/svg/avatars.svg" , 128)
             .icon("algo"       , "./assets/svg/algorithm_48px.svg" , 48)
+            .icon("close"      , "./assets/svg/close_48px.svg" , 48)
+            .icon("earth"      , "./assets/svg/earth_48px.svg", 48)
+            .icon("earth2"     , "./assets/svg/earth_2_48px.svg", 48)
+            .icon("blueeye"    , "./assets/svg/blueeye_48px.svg", 48)
             .icon("photo"      , "./assets/svg/photo_48px.svg" , 48)
             .icon("filter"     , "./assets/svg/filter_48px.svg" , 48)
             .icon("firstpagearrow" , "./assets/svg/first_page_arrow_48px.svg" , 48)
@@ -17,6 +21,7 @@ angular
             .icon("menu"       , "./assets/svg/menu.svg" , 24)
             .icon("movie"      , "./assets/svg/movies_48px.svg" , 48)
             .icon("playarrow"  , "./assets/svg/play_arrow_black_48px.svg" , 48)
+            .icon("redeye"     , "./assets/svg/redeye_48px.svg", 48)
             .icon("rightarrow" , "./assets/svg/right_arrow_48px.svg" , 48)
             .icon("satellite"  , "./assets/svg/satellite_48px.svg" , 48)
             .icon("share"      , "./assets/svg/share.svg" , 24)

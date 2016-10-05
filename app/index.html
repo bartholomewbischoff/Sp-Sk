@@ -42,6 +42,9 @@
     <script src="./src/Main/MapService.js"></script>
     <script src="./src/index.js"></script>
 
+    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+
     <!-- <script src="http://openlayers.org/en/v3.18.2/build/ol.js"></script> -->
 
   </head>
@@ -343,13 +346,18 @@
               <!-- Controls that create a product -->
               <div class="productControls" layout="row">
 
+                <!-- Button to view sattellite info -->
+                <md-button ng-click="showSatelliteToast()" class="menuButton md-primary" aria-label="View Satellite Location" style="margin-right: 0px; margin-left: 0px;">
+                  <md-icon md-menu-origin md-svg-icon="earth2"></md-icon>
+                </md-button>
+
                 <!-- Button to create movie -->
-                <md-button ng-click="" class="menuButton md-primary mapFirst" aria-label="Create movie" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-click="" class="menuButton md-primary" aria-label="Create movie" style="margin-right: 0px; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="movie"></md-icon>
                 </md-button>
 
                 <!-- Button to take image -->
-                <md-button ng-click="" class="menuButton md-primary mapFirst" aria-label="Create image" style="margin-right: auto; margin-left: 0px;">
+                <md-button ng-click="" class="menuButton md-primary" aria-label="Create image" style="margin-right: auto; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="photo"></md-icon>
                 </md-button>
 
@@ -359,7 +367,7 @@
               <div class="playControls" layout="row">
 
                 <!-- Button to goto first image -->
-                <md-button ng-click="ctrl.startOption()" class="menuButton md-primary mapFirst" aria-label="First image control" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-click="ctrl.startOption()" class="menuButton md-primary mapFirst" aria-label="First image control" style="margin-right: 0px; margin-left: auto;">
                   <md-icon md-menu-origin md-svg-icon="firstpagearrow"></md-icon>
                 </md-button>
 
@@ -384,7 +392,7 @@
                 </md-button>
 
                 <!-- Button to go to last image -->
-                <md-button ng-click="ctrl.endOption()" class="menuButton md-primary mapLast" aria-label="Last image control" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-click="ctrl.endOption()" class="menuButton md-primary mapLast" aria-label="Last image control" style="margin-right: auto; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="lastpagearrow"></md-icon>
                 </md-button>
 

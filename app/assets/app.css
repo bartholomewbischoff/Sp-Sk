@@ -12,6 +12,17 @@ html, body {
   font-weight: bold;
 }
 
+/* Toasts ------------------------------------------------*/
+md-toast {
+  min-height: 200px !important;
+  min-width: 200px !important;
+  background-color: rgb(66,66,66);
+}
+
+.satelliteWidget {
+  padding: 0px 5px 10px 5px;
+}
+
 /* Toolbar area ------------------------------------------------*/
 
 .menuButton {
@@ -70,21 +81,15 @@ md-toolbar .search input {
 }
 
 .productControls {
-  width: 33%;
-  margin-right: auto; 
-  margin-left: 0px;
+  width: 33.33%;
 } 
 
 .playControls {
-  width: 33%;
-  margin-right: auto; 
-  margin-left: auto;
+  width: 33.33%;
 } 
 
 .optionControls {
-  width: 33%;
-  margin-right: 0px; 
-  margin-left: auto;
+  width: 33.33%;
 }
 
 .scroll-text {
