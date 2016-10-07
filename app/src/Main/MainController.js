@@ -36,14 +36,17 @@ angular
     // creates a toast to hold the satellite location info
     $scope.showSatelliteToast = function() {
         $mdToast.show({
-          hideDelay   : 100000,
+          hideDelay   : 40000,
           parent      : '.map',
           position    : 'bottom left',
+          controller  : 'MainController',
           templateUrl : 'satelliteToast.html'
         });
+        isDlgOpen = true;
     };
     // controls the opening and closing of the satellite toast
     $scope.closeSatelliteToast = function() {
+        console.log('testing');
         if (isDlgOpen) return;
 
         $mdToast
