@@ -24,8 +24,8 @@ $.fn.scrollbox = function(config) {
     onMouseOverPause: true,
     paused: false,
     queue: null,
-    listElement: 'ul',
-    listItemElement:'li',
+    listElement: 'md-list',
+    listItemElement:'md-list-item',
     infiniteLoop: true,     // Infinite loop or not
     switchAmount: 0,        // Give a number if you don't want to have infinite loop
     afterForward: null,     // Callback function after each forward action

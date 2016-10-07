@@ -4,7 +4,9 @@
 	- added angular material toast element linked to satellite icon
 	- embedded d3 based rotating earth in toast element
 	- corrected positioning of elements in the map controls toolbar
-	- 
+	- fixed intro.js bubble positioning bug occurring for help tutorials on right hand sidenavs
+	- added timeline capability to the controls toolbar
+	- linked image button in timeline to change displayed image on map
 
 9/30/2016
 -------------------------------------------------------

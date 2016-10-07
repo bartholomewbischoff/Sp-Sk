@@ -3,6 +3,9 @@ angular
   .controller('MainController', function($scope, $mdDialog, $mdSidenav, $mdToast, DefaultConfigs, MapService) {
     var originatorEv
     var currentImages = [1, 2, 3, 4, 5];
+    //$scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}, {id:6}, {id:7}, {id:8}, {id:9}, {id:10}, {id:11}, {id:12}, {id:13}, {id:14}, {id:15}, {id:16}, {id:17}, {id:18}, {id:19}, {id:20}, {id:21}, {id:22}];
+    $scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}];
+    $scope.lenCurrentImages = $scope.testcurrentImages.length;
     var isDlgOpen;
 
     $scope.data = DefaultConfigs;
@@ -10,12 +13,32 @@ angular
     $scope.playStatus = true;
     $scope.HelpOptions = $scope.MainIntroOptions;
 
+    // build timeline for images using svg and d3 library
+    var mapTimeline = function() {
+        var root = d3.select('.timeLine').append('svg')
+            .attr('width', 300)
+            .attr('height', 60)
+            .style('border', '1px solid white');
+
+        root.selectAll('image')
+            .data([3, 6, 9, 12, 15])
+            .enter().append('image')
+                .attr({
+                    'xlink:href': 'http://127.0.0.1:8080/app/assets/svg/blueeye_48px.svg',
+                    'class': 'tlctrl-vis',
+                    'height': 24,
+                    'width': 24,
+                })
+                .attr('x', Object)
+                .attr('y', Object);
+    }
+    
     // creates a toast to hold the satellite location info
     $scope.showSatelliteToast = function() {
         $mdToast.show({
           hideDelay   : 100000,
+          parent      : '.map',
           position    : 'bottom left',
-          controller  : 'MainController',
           templateUrl : 'satelliteToast.html'
         });
     };
@@ -38,12 +61,41 @@ angular
     
     // delays initialization of the openlayers map until page is ready
     angular.element(document.querySelector('#map')).ready(function () {
-      setTimeout(
-        function() {
-          console.log("The map area is ready !!")
-          initializeMap();
-        }, 5);
+        setTimeout(
+            function() {
+            initializeMap();
+            }, 5);
+            
+        // code to handle scrollbox for timeline
+        $('.timeLineScrollBox').scrollbox({
+            direction: 'h',
+            distance: 140,
+            infiniteLoop: false,
+            autoPlay: false
+        });
+
+        $('.timeLineScrollBack').click(function () {
+            console.log("Back was clicked");
+            $('.timeLineScrollBox').trigger('backward');
+        });
+
+        $('.timeLineScrollFwd').click(function () {
+            console.log("Fwd was clicked");
+            $('.timeLineScrollBox').trigger('forward');
+        });
     });
+
+    // function to display selected image in timeline
+    this.gotoImage = function(id) {
+        console.log("I was clicked");
+        console.log(id);
+        $scope.ind = id - 1;
+        MapService.updateCurrentRotation();
+        MapService.updateCurrentZoom();
+        MapService.updateCurrentCenter();
+        MapService.resetMap();
+        initializeMap();
+    }
 
     // function to move forward one image
     this.forwardOption = function() {
@@ -381,5 +433,8 @@ angular
       this.toggle('algonav');
       originatorEv = null;
     };
+
+    // add timeline to the DOM
+    //mapTimeline();
 
   });

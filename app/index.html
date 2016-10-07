@@ -399,8 +399,24 @@
               </div>
 
               <!-- Controls that handle options for the images -->
-              <div class="optionControls" layout='row'>
+              <div class="timeLine" layout='row'>
                 
+                <md-button class="timeLineScrollBack" aria-label="Front of image stack" style="margin-right: 0px; margin-left: auto;">
+                  <md-icon md-svg-icon="leftarrow"></md-icon>
+                </md-button>
+
+                <div class="timeLineScrollBox" layout='row' flex>
+                  <md-list layout='row'>
+                    <md-list-item ng-repeat="item in testcurrentImages" ng-click="ctrl.gotoImage(item.id)">
+                      <md-icon md-svg-icon="bluerect" class="" aria-label="Image" alt="{{ item.id }}"></md-icon>
+                    </md-list-item>
+                  </md-list>
+                </div>
+
+                <md-button class="timeLineScrollFwd" aria-label="End of image stack" style="margin-right: auto; margin-left: 0px;">
+                  <md-icon md-svg-icon="rightarrow"></md-icon>
+                </md-button>
+
               </div>
 
             </md-toolbar>

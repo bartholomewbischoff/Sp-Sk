@@ -12,6 +12,21 @@ html, body {
   font-weight: bold;
 }
 
+/* Timeline ----------------------------------------------*/
+/*.timeLine md-list-item {
+  padding: 0px 2px 0px 2px;
+  width: 30px;
+  height: 40px;
+}*/
+
+.timeLineScrollBox {
+  height: inherit;
+}
+
+.timeLineScrollBox md-list {
+  margin: 0px auto 0px auto;
+}
+
 /* Toasts ------------------------------------------------*/
 md-toast {
   min-height: 200px !important;
@@ -88,7 +103,7 @@ md-toolbar .search input {
   width: 33.33%;
 } 
 
-.optionControls {
+.timeLine {
   width: 33.33%;
 }
 
