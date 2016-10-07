@@ -351,7 +351,7 @@ angular
           .targetEvent(originatorEv)
           .clickOutsideToClose(true)
           .parent('body')
-          .title('HEMI Chip and Stitch')
+          .title('Algorithm 1')
           .textContent('Options will go here ...')
           .ok('Execute')
       );
@@ -366,7 +366,7 @@ angular
           .targetEvent(originatorEv)
           .clickOutsideToClose(true)
           .parent('body')
-          .title('Monsoon')
+          .title('Algorithm 2')
           .textContent('Options will go here ...')
           .ok('Execute')
       );
@@ -381,7 +381,7 @@ angular
           .targetEvent(originatorEv)
           .clickOutsideToClose(true)
           .parent('body')
-          .title('Arapaho')
+          .title('Algorithm 3')
           .textContent('Options will go here ...')
           .ok('Execute')
       );
@@ -396,7 +396,7 @@ angular
           .targetEvent(originatorEv)
           .clickOutsideToClose(true)
           .parent('body')
-          .title('Stereo Cloud Top Altitude')
+          .title('Algorithm 4')
           .textContent('Options will go here ...')
           .ok('Execute')
       );
@@ -411,7 +411,7 @@ angular
           .targetEvent(originatorEv)
           .clickOutsideToClose(true)
           .parent('body')
-          .title('GIFT')
+          .title('Algorithm 5')
           .textContent('Options will go here ...')
           .ok('Execute')
       );
@@ -426,7 +426,7 @@ angular
           .targetEvent(originatorEv)
           .clickOutsideToClose(true)
           .parent('body')
-          .title('GOSS/SuperGOSS')
+          .title('Algorithm 6')
           .textContent('Options will go here ...')
           .ok('Execute')
       );
