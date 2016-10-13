@@ -54,7 +54,7 @@ angular
             },
 
             // how long to leave each "frame" on the screen in ms
-            'updateInterval': 250,
+            'updateInterval': 500,
 
             'optionDefaults': {
                 'aoi': '3',

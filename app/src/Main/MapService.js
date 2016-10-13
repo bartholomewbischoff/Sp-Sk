@@ -3,11 +3,13 @@ angular
     .service('MapService', function(DefaultConfigs) {
 
         this.map = null;
-        this.imageLayer = null;
+        this.layers = [];
+        // this.imageLayer = null;
         this.proj = null;
         this.baseURL = 'http://127.0.0.1:8888/';
         this.currentImages = [1, 2, 3, 4, 5];
-        this.iter = 0;
+        this.currentIter = 0;
+        this.prevIter = null;
         this.zoomLevel = DefaultConfigs.optionDefaults.zoom;
         this.currentZoomLevel = this.zoomLevel;
         this.centerValue = [DefaultConfigs.optionDefaults.x, DefaultConfigs.optionDefaults.y];
@@ -24,9 +26,9 @@ angular
         }
 
         // creates a map layer
-        this.createLayer = function(ind=this.iter) {
+        this.createLayer = function(ind=this.currentIter, isVisible=false) {
 
-            this.imageLayer = new ol.layer.Tile({
+            imageLayer = new ol.layer.Tile({
                 preload: Infinity,
                 source: new ol.source.XYZ({
                     //url: 'http://127.0.0.1:8888/{z}-{y}-{x}.png',
@@ -34,16 +36,30 @@ angular
                     projection: this.proj,
                     wrapX: false
                 }),
-                transitionEffect: 'resize'
+                transitionEffect: 'resize',
+                visible: isVisible
             });
-            return this.imageLayer;
+            return imageLayer;
         }
 
         // updates the map layers
-        this.updateLayers = function(ind=null) {
-            var currentLayers = [];
-            newLayer = this.createLayer(ind);
-            this.map.addLayer(newLayer);
+        this.buildLayers = function() {
+            var temp = null;
+            for (i = 0; i < this.currentImages.length; i++) {
+                temp = this.createLayer(ind=i, isVisible=false);
+                this.layers.push(temp);
+            }
+        }
+
+        // set visibility of a layer
+        this.setVisibility = function(ind=this.currentIter, prev=this.prevIter) {
+            
+            var temp = this.map.getLayers().getArray();
+            console.log(prev);
+            if (prev) {
+                temp[prev].setVisible(false);
+            }
+            temp[ind].setVisible(true);
         }
 
         // 90° rotation controls
@@ -126,11 +142,9 @@ angular
         ol.inherits(this.Rotate270, ol.control.Control);
 
         // creates an openlayers map
-        this.createMap = function(target, ind=this.iter) {
-            console.log("The ind value is ....")
-            console.log(ind);
+        this.createMap = function(target) {
             this.createProjection();
-            var layer = this.createLayer(ind);
+            this.buildLayers();
 
             var logoElement = document.createElement('a');
             logoElement.href = 'http://www.osgeo.org/';
@@ -142,7 +156,7 @@ angular
             logoElement.appendChild(logoImage);
 
             this.map = new ol.Map({
-                layers: [layer],
+                layers: this.layers,
                 target: target,
                 renderer: 'canvas',
                 controls: ol.control.defaults().extend([
@@ -184,6 +198,11 @@ angular
         // retain current view rotation
         this.updateCurrentRotation = function() {
             this.currentRotationValue = this.map.getView().getRotation();
+        }
+
+        // update layers on map
+        this.updateLayers = function(layers) {
+            this.map.getLayers().insertAt(0, layers);
         }
 
 });

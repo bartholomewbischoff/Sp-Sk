@@ -1,16 +1,15 @@
 angular
   .module('main', ['ngMaterial'])
-  .controller('MainController', function($scope, $mdDialog, $mdSidenav, $mdToast, DefaultConfigs, MapService) {
+  .controller('MainController', function($interval, $scope, $mdDialog, $mdSidenav, $mdToast, DefaultConfigs, MapService) {
     var originatorEv
     var currentImages = [1, 2, 3, 4, 5];
-    //$scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}, {id:6}, {id:7}, {id:8}, {id:9}, {id:10}, {id:11}, {id:12}, {id:13}, {id:14}, {id:15}, {id:16}, {id:17}, {id:18}, {id:19}, {id:20}, {id:21}, {id:22}];
-    $scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}];
+    $scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}, {id:6}, {id:7}, {id:8}, {id:9}, {id:10}, {id:11}, {id:12}, {id:13}, {id:14}, {id:15}, {id:16}, {id:17}, {id:18}, {id:19}, {id:20}, {id:21}, {id:22}];
+    //$scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}];
     $scope.lenCurrentImages = $scope.testcurrentImages.length;
     var isDlgOpen;
 
     $scope.data = DefaultConfigs;
-    $scope.ind = 0;
-    $scope.playStatus = true;
+    $scope.playStatus = false;
     $scope.HelpOptions = $scope.MainIntroOptions;
 
     // build timeline for images using svg and d3 library
@@ -58,7 +57,8 @@ angular
 
     // initialize the openlayers map
     var initializeMap = function(target = 'map') {  
-        MapService.createMap(target, $scope.ind);
+        MapService.createMap(target);
+        MapService.setVisibility();
         console.log("The map was initialized ...");
     };
     
@@ -66,14 +66,18 @@ angular
     angular.element(document.querySelector('#map')).ready(function () {
         setTimeout(
             function() {
-            initializeMap();
+                initializeMap();
             }, 5);
             
         // code to handle scrollbox for timeline
         $('.timeLineScrollBox').scrollbox({
+            listElement: 'md-list',
+            listItemElement:'md-list-item',
             direction: 'h',
-            distance: 140,
+            switchItems: 1,
+            distance: 1,
             infiniteLoop: false,
+            switchAmount: 0,
             autoPlay: false
         });
 
@@ -88,83 +92,95 @@ angular
         });
     });
 
+    // update the map
+    var updateMap = function() {
+        MapService.updateCurrentRotation();
+        MapService.updateCurrentZoom();
+        MapService.updateCurrentCenter();
+        MapService.setVisibility();
+    }
+
     // function to display selected image in timeline
     this.gotoImage = function(id) {
         console.log("I was clicked");
         console.log(id);
-        $scope.ind = id - 1;
+        MapService.prevIter = MapService.currentIter;
+        MapService.currentIter = id - 1;
         MapService.updateCurrentRotation();
         MapService.updateCurrentZoom();
         MapService.updateCurrentCenter();
-        MapService.resetMap();
-        initializeMap();
+        MapService.setVisibility(ind=(id-1));
     }
+
+    this.setupAnimation = function() {
+        var svc = this;
+        animationRunner = $interval(function() {
+            svc.forwardOption();
+        }, DefaultConfigs.updateInterval);
+    };
 
     // function to move forward one image
     this.forwardOption = function() {
       console.log("The forward button was clicked ...");
-      if ($scope.ind < (currentImages.length - 1)) {
-          $scope.ind = $scope.ind + 1;
+      if (MapService.currentIter < (currentImages.length - 1)) {
+          MapService.prevIter = MapService.currentIter;
+          MapService.currentIter = MapService.currentIter + 1;
       }
       else {
-          $scope.ind = 0;
+          MapService.prevIter = MapService.currentIter;
+          MapService.currentIter = 0;
       };
-      MapService.updateCurrentRotation();
-      MapService.updateCurrentZoom();
-      MapService.updateCurrentCenter();
-      MapService.resetMap();
-      initializeMap();
+      updateMap();
     };
 
     // function to move backward one image
     this.backwardOption = function() {
       console.log("The backward button was clicked ...");
-      if ($scope.ind > 0)  {
-          $scope.ind = $scope.ind - 1;
+      if (MapService.currentIter > 0)  {
+          MapService.prevIter = MapService.currentIter;
+          MapService.currentIter = MapService.currentIter - 1;
       }
       else {
-          $scope.ind = currentImages.length - 1;
+          MapService.prevIter = MapService.currentIter;
+          MapService.currentIter = currentImages.length - 1;
       };
-      MapService.updateCurrentRotation();
-      MapService.updateCurrentZoom();
-      MapService.updateCurrentCenter();
-      MapService.resetMap();
-      initializeMap();
+      updateMap();
     };
 
     // function to move to end image
     this.endOption = function() {
       console.log("The end button was clicked ...");
-      $scope.ind = currentImages.length - 1;
-      MapService.updateCurrentRotation();
-      MapService.updateCurrentZoom();
-      MapService.updateCurrentCenter();
-      MapService.resetMap();
-      initializeMap();
+      MapService.prevIter = MapService.currentIter;
+      MapService.currentIter = currentImages.length - 1;
+      updateMap();
     };
 
     // function to move to start image
     this.startOption = function() {
       console.log("The start button was clicked ...");
-      $scope.ind = 0;
-      MapService.updateCurrentRotation();
-      MapService.updateCurrentZoom();
-      MapService.updateCurrentCenter();
-      MapService.resetMap();
-      initializeMap();
+      MapService.prevIter = MapService.currentIter;
+      MapService.currentIter = 0;
+      updateMap();
     };
 
     // function to play through images
     this.playOption = function() {
+
       console.log("The play button was clicked ...");
-      $scope.playStatus = false;
+      $scope.playStatus = true;
+      this.setupAnimation();
+
     };
 
     // function to stop playing through images
     this.stopOption = function() {
       console.log("The stop button was clicked ...");
-      $scope.playStatus = true;
-    };
+      $scope.playStatus = false;
+      if (angular.isDefined(animationRunner)) {
+            $interval.cancel(animationRunner);
+            animationRunner = undefined;
+        }
+    }
 
     // function to toggle sidenav for search results, algorithms, filter options, and help menus
     this.toggle = function(navID) {
@@ -314,27 +330,27 @@ angular
         {
             element: '.filterstep1',
             intro: 'Select the desired satellite.',
-            position: 'auto'
+            position: 'right'
         },
         {
             element: '.filterstep2',
             intro: 'Select a pre-defined AOI.',
-            position: 'auto'
+            position: 'right'
         },
         {
             element: '.filterstep3',
             intro: 'If a live feed is selected check the "live feed" box", otherwise select a date and time.',
-            position: 'auto'
+            position: 'right'
         },
         {
             element: '.filterstep4',
             intro: 'Select the number of hours back from the selected date/time desired.',
-            position: 'auto'
+            position: 'right'
         },
         {
             element: '.filterstep5',
             intro: 'Click the "Apply" button when settings are as desired.',
-            position: 'left'
+            position: 'right'
         }],
         showStepNumbers: false, 
         showBullets: true,

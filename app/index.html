@@ -6,7 +6,7 @@
     <!-- <link rel="shortcut icon" type="image/png" href="favicon.ico" /> -->
 
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html"; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html"; charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
@@ -93,7 +93,7 @@
         </md-sidenav>
 
         <!-- SideNav for Filter Options -->
-        <md-sidenav md-component-id="filternav" class="filternav md-sidenav-right md-whiteframe-z2 md-closed">
+        <md-sidenav md-component-id="filternav" class="filternav md-sidenav-left md-whiteframe-z2 md-closed">
           
           <md-toolbar layout="row">
             <h1 class="md-toolbar-tools">Filter Options</h1>
@@ -196,14 +196,14 @@
               <md-list-item class="algostep2">
                 <md-button ng-click="ctrl.monsoonMenu()">
                   <md-icon md-svg-icon="menu" class="avatar"></md-icon>
-                  Algorithm 2
+                  MONSOON
                 </md-button>
               </md-list-item>
             
               <md-list-item class="algostep3">
                 <md-button ng-click="ctrl.arapahoMenu()">
                   <md-icon md-svg-icon="menu" class="avatar"></md-icon>
-                  Algorithm 3
+                  ARAPAHO
                 </md-button>
               </md-list-item>
             
@@ -286,7 +286,7 @@
           <md-content>
             <div layout="row" style="margin: 10px 5px 10px 5px;">
               <img src="./assets/images/af.png" class="logo" title="United States Air Force" style="margin-left: 0px; margin-right: auto;"/>
-              <img ng-if="data.selectedApp.id == 1" src="./assets/images/spectre.png" class="logo-spectre" title="Spectre" style="margin-left: auto; margin-right: auto;/>
+              <img ng-if="data.selectedApp.id == 1" src="./assets/images/spectre.png" class="logo-spectre" title="Spectre" style="margin-left: auto; margin-right: auto;"/>
               <img ng-if="data.selectedApp.id == 2" src="./assets/images/skyfall-cornflower2.png" class="logo-spectre" title="Skyfall" height="26" style="margin-left: auto; margin-right: auto;"/>
               <img src="./assets/images/nasic.png" class="logo" title="NASIC" style="margin-left: auto; margin-right: 0px;"/>
             </div>
@@ -324,7 +324,7 @@
           </md-button>
 
           <!-- Trigger element for Filter menu -->
-          <md-button class="menuButton step2" ng-click="ctrl.toggle('filternav')" aria-label="Show Filter Options" style="margin-right: 0px; margin-left: auto;">
+          <md-button class="menuButton step2" ng-click="ctrl.toggle('filternav')" aria-label="Show Filter Options" style="margin-right: auto; margin-left: 0px;">
             <md-icon md-svg-icon="filter" ></md-icon>
           </md-button>
 
@@ -367,32 +367,32 @@
               <div class="playControls" layout="row">
 
                 <!-- Button to goto first image -->
-                <md-button ng-click="ctrl.startOption()" class="menuButton md-primary mapFirst" aria-label="First image control" style="margin-right: 0px; margin-left: auto;">
+                <md-button ng-click="ctrl.startOption()" ng-disabled="playStatus" class="menuButton md-primary mapFirst" aria-label="First image control" style="margin-right: 0px; margin-left: auto;">
                   <md-icon md-menu-origin md-svg-icon="firstpagearrow"></md-icon>
                 </md-button>
 
                 <!-- Button to go back one image -->
-                <md-button ng-click="ctrl.backwardOption()" class="menuButton md-primary mapBack" aria-label="Left image control" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-click="ctrl.backwardOption()" ng-disabled="playStatus" class="menuButton md-primary mapBack" aria-label="Left image control" style="margin-right: 0px; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="leftarrow"></md-icon>
                 </md-button>
 
                 <!-- Button to control play of images -->
-                <md-button ng-if="playStatus" ng-click="ctrl.playOption()" class="menuButton md-primary mapPlay" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-if="!playStatus" ng-click="ctrl.playOption()" class="menuButton md-primary mapPlay" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="playarrow"></md-icon>
                 </md-button>
 
                 <!-- Button to stop play of images -->
-                <md-button ng-if="!playStatus" ng-click="ctrl.stopOption()" class="menuButton md-primary mapStop" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-if="playStatus" ng-click="ctrl.stopOption()" class="menuButton md-primary mapStop" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="stop"></md-icon>
                 </md-button>
 
                 <!-- Button to go forward one image -->
-                <md-button ng-click="ctrl.forwardOption()" class="menuButton md-primary mapFwd" aria-label="Right image control" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-click="ctrl.forwardOption()" ng-disabled="playStatus" class="menuButton md-primary mapFwd" aria-label="Right image control" style="margin-right: 0px; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="rightarrow"></md-icon>
                 </md-button>
 
                 <!-- Button to go to last image -->
-                <md-button ng-click="ctrl.endOption()" class="menuButton md-primary mapLast" aria-label="Last image control" style="margin-right: auto; margin-left: 0px;">
+                <md-button ng-click="ctrl.endOption()" ng-disabled="playStatus" class="menuButton md-primary mapLast" aria-label="Last image control" style="margin-right: auto; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="lastpagearrow"></md-icon>
                 </md-button>
 
@@ -405,10 +405,14 @@
                   <md-icon md-svg-icon="leftarrow"></md-icon>
                 </md-button>
 
-                <div class="timeLineScrollBox" layout='row' flex>
+                <div class="timeLineScrollBox" layout='row' layout-align="center center" flex>
                   <md-list layout='row'>
-                    <md-list-item ng-repeat="item in testcurrentImages" ng-click="ctrl.gotoImage(item.id)">
-                      <md-icon md-svg-icon="bluerect" class="" aria-label="{{ item.id }}" alt="{{ item.id }}"></md-icon>
+                    <md-list-item ng-repeat="item in testcurrentImages">
+                      <md-button class="md-fab md-mini md-primary timeLineButtons" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item.id)" aria-label="Image Button {{ item.id }}" value="{{ item.id }}" style="margin-right: 0px; margin-left: auto;">
+                        <!-- <md-icon ng-if="item.id % 2 == 0" md-svg-icon="close"></md-icon> -->
+                        <!-- <md-icon ng-if="item.id % 2 != 0" md-svg-icon="redrect"></md-icon> -->
+                        {{ item.id }}
+                      </md-button>
                     </md-list-item>
                   </md-list>
                 </div>

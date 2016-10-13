@@ -21,10 +21,23 @@ html, body {
 
 .timeLineScrollBox {
   height: inherit;
+  overflow: hidden;
 }
 
 .timeLineScrollBox md-list {
   margin: 0px auto 0px auto;
+}
+
+.timeLineScrollBox md-icon {
+  position: relative;
+  left: 26px;
+}
+
+.timeLineButtons span{
+      /*padding: 0 0 0 16px;*/
+      display:table;
+      margin-left: auto;
+      margin-right: auto;
 }
 
 /* Toasts ------------------------------------------------*/
