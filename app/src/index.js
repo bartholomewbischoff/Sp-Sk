@@ -26,6 +26,7 @@ angular
             .icon("redrect"    , "./assets/svg/tile_red.svg", 48)
             .icon("rightarrow" , "./assets/svg/right_arrow_48px.svg" , 48)
             .icon("satellite"  , "./assets/svg/satellite_48px.svg" , 48)
+            .icon("settings"   , "./assets/svg/settings_48px.svg" , 48)
             .icon("share"      , "./assets/svg/share.svg" , 24)
             .icon("stop"       , "./assets/svg/stop_48px.svg" , 48);
             

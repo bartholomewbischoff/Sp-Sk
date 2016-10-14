@@ -10,27 +10,22 @@ angular
 
     $scope.data = DefaultConfigs;
     $scope.playStatus = false;
-    $scope.HelpOptions = $scope.MainIntroOptions;
+    $scope.helpSettings;
 
-    // build timeline for images using svg and d3 library
-    var mapTimeline = function() {
-        var root = d3.select('.timeLine').append('svg')
-            .attr('width', 300)
-            .attr('height', 60)
-            .style('border', '1px solid white');
+    // delays initialization of the openlayers map until page is ready
+    angular.element(document.querySelector('#map')).ready(function () {
+        setTimeout(
+            function() {
+                initializeMap();
+            }, 5);
 
-        root.selectAll('image')
-            .data([3, 6, 9, 12, 15])
-            .enter().append('image')
-                .attr({
-                    'xlink:href': 'http://127.0.0.1:8080/app/assets/svg/blueeye_48px.svg',
-                    'class': 'tlctrl-vis',
-                    'height': 24,
-                    'width': 24,
-                })
-                .attr('x', Object)
-                .attr('y', Object);
-    }
+        $('#horizontal-container').slimscroll({
+            alwaysVisible: true,
+            height: '64px',
+            width: '95%',
+            axis: 'x'
+        });
+    });
     
     // creates a toast to hold the satellite location info
     $scope.showSatelliteToast = function() {
@@ -43,6 +38,7 @@ angular
         });
         isDlgOpen = true;
     };
+
     // controls the opening and closing of the satellite toast
     $scope.closeSatelliteToast = function() {
         console.log('testing');
@@ -61,36 +57,6 @@ angular
         MapService.setVisibility();
         console.log("The map was initialized ...");
     };
-    
-    // delays initialization of the openlayers map until page is ready
-    angular.element(document.querySelector('#map')).ready(function () {
-        setTimeout(
-            function() {
-                initializeMap();
-            }, 5);
-            
-        // code to handle scrollbox for timeline
-        $('.timeLineScrollBox').scrollbox({
-            listElement: 'md-list',
-            listItemElement:'md-list-item',
-            direction: 'h',
-            switchItems: 1,
-            distance: 1,
-            infiniteLoop: false,
-            switchAmount: 0,
-            autoPlay: false
-        });
-
-        $('.timeLineScrollBack').click(function () {
-            console.log("Back was clicked");
-            $('.timeLineScrollBox').trigger('backward');
-        });
-
-        $('.timeLineScrollFwd').click(function () {
-            console.log("Fwd was clicked");
-            $('.timeLineScrollBox').trigger('forward');
-        });
-    });
 
     // update the map
     var updateMap = function() {
@@ -112,10 +78,10 @@ angular
         MapService.setVisibility(ind=(id-1));
     }
 
-    this.setupAnimation = function() {
-        var svc = this;
+    this.mapAnimation = function() {
+        var mapani = this;
         animationRunner = $interval(function() {
-            svc.forwardOption();
+            mapani.forwardOption();
         }, DefaultConfigs.updateInterval);
     };
 
@@ -165,11 +131,8 @@ angular
 
     // function to play through images
     this.playOption = function() {
-
-      console.log("The play button was clicked ...");
       $scope.playStatus = true;
-      this.setupAnimation();
-
+      this.mapAnimation();
     };
 
     // function to stop playing through images
@@ -187,10 +150,10 @@ angular
       $mdSidenav(navID).toggle();
     };
 
-    // function to define the help bubbles
-    this.helpOverlayIntro = function() {
+    // function to define the main help bubbles
+    this.mainHelp = function() {
       this.toggle('helpnav');
-      $scope.HelpOptions = $scope.MainIntroOptions;
+      $scope.helpSettings = this.mainHelpSettings;
       setTimeout(
           function() {
             $scope.CallMe();
@@ -198,8 +161,8 @@ angular
     };
 
     // function to open the algorithms menu
-    this.algoHelpOverlayIntro = function() {
-      $scope.HelpOptions = $scope.AlgoIntroOptions;
+    this.algoHelp = function() {
+      $scope.helpSettings = this.algoHelpSettings;
       setTimeout(
           function() {
             $scope.CallMe();
@@ -207,8 +170,8 @@ angular
     };
 
     // function to open the algorithms menu
-    this.filterHelpOverlayIntro = function() {
-      $scope.HelpOptions = $scope.FilterIntroOptions;
+    this.filterHelp = function() {
+      $scope.helpSettings = this.filterHelpSettings;
       setTimeout(
           function() {
             $scope.CallMe();
@@ -216,7 +179,7 @@ angular
     };
 
     // function to open the phenomenology menu
-    this.phenomHelpOptions = function() {
+    this.phenomHelp = function() {
       this.toggle('helpnav');
       this.toggle('phenomnav');
     };
@@ -228,22 +191,37 @@ angular
     }
 
     // Options for the help overlay
-    $scope.MainIntroOptions = {
+    this.mainHelpSettings = {
         steps:[
         {
-            element: '.step1',
+            element: '.algoMenuButton',
             intro: 'Click here to access the available algorithms.',
             position: 'right'
         },
         {
-            element: '.step2',
+            element: '.filterMenuButton',
             intro: 'Click here to change the filter options.',
-            position:'left'
+            position:'right'
         },
         {
-            element: '.step3',
-            intro: 'Imagery data will be displayed here. Rotate the image by using the ALT + SHIFT keys and the mouse to then grab the image and rotate.',
-            position: 'top'
+            element: '.settingsMenuButton',
+            intro: 'Click here to change the applications defualt settings.',
+            position: 'left'
+        },
+        {
+            element: '.satFootButton',
+            intro: 'Click here to view the footprint of the current sensor.',
+            position: 'right'
+        },
+        {
+            element: '.movieMenuButton',
+            intro: 'Click here to create a movie from the currently loaded image layers.',
+            position: 'right'
+        },
+        {
+            element: '.photoMenuButton',
+            intro: 'Click here to take a snapshot of the currently displayed layer.',
+            position: 'right'
         },
         {
             element: '.playControls',
@@ -251,17 +229,22 @@ angular
             position: 'bottom'
         },
         {
+            element: '#horizontal-container',
+            intro: 'The tiles returned after setting the filter options are displayed here.  Click one to directly display that tile in the map region.  A red tile indicates that tile is missing and cannot be displayed.  A yellow tile indicates that tile is currently being viewed.',
+            position: 'bottom'
+        },
+        {
+            element: '.TrickingIntroJSwithThisClassName',
+            intro: 'Imagery data will be displayed here. Rotate the image by using the ALT + SHIFT keys and the mouse to then grab the image and rotate.',
+            position: 'top'
+        },
+        {
             element: '.ol-zoom',
             intro: 'Change zoom levels using these buttons or by using your mouse scroll wheel.',
             position: 'right'
         },
         {
-            element: '.ol-full-screen',
-            intro: 'Switch to the full screen mode if more viewing space is desired.  Switch back to the normal view using the ESC key or by clicking the maps X button.' ,
-            position: 'left'
-        },
-        {
-            element: '.step7',
+            element: '.rotate-90',
             intro: 'Use the rotation controls to quickly rotate the image to a preset orientation.',
             position: 'right'
         },
@@ -269,6 +252,11 @@ angular
             element: '.ol-rotate-reset',
             intro: 'If the image is oriented from 0°, a button will display here which allows the user to quickly reorient the image to the 0° view.',
             position: 'right'
+        },
+        {
+            element: '.ol-full-screen',
+            intro: 'Switch to the full screen mode if more viewing space is desired.  Switch back to the normal view using the ESC key or by clicking the maps X button.' ,
+            position: 'left'
         }],
         showStepNumbers: false, 
         showBullets: true,
@@ -282,35 +270,35 @@ angular
     };
 
     //Algorithms help options
-    $scope.AlgoIntroOptions = {
+    this.algoHelpSettings = {
         steps:[
         {
-              element: '.algostep1',
+              element: '.hemiMenuButton',
               intro: 'Algorithm 1',
               position: 'right'
           },
           {
-              element: '.algostep2',
+              element: '.monsoonMenuButton',
               intro: 'Algorithm 2',
               position: 'right'
           },
           {
-              element: '.algostep3',
+              element: '.arapahoMenuButton',
               intro: 'Algorithm 3',
               position: 'right'
           },
           {
-              element: '.algostep4',
+              element: '.stereoMenuButton',
               intro: 'Algorithm 4',
               position: 'right'
           },
           {
-              element: '.algostep5',
+              element: '.giftMenuButton',
               intro: 'Algorithm 5',
               position: 'right'
           },
           {
-              element: '.algostep6',
+              element: '.gossMenuButton',
               intro: 'Algorithm 6',
               position: 'right'
           }],
@@ -325,30 +313,25 @@ angular
     };
 
     // Filter help options
-    $scope.FilterIntroOptions = {
+    this.filterHelpSettings = {
       steps:[
         {
-            element: '.filterstep1',
+            element: '.sensorControls',
             intro: 'Select the desired satellite.',
             position: 'right'
         },
         {
-            element: '.filterstep2',
-            intro: 'Select a pre-defined AOI.',
-            position: 'right'
-        },
-        {
-            element: '.filterstep3',
+            element: '.timeControls',
             intro: 'If a live feed is selected check the "live feed" box", otherwise select a date and time.',
             position: 'right'
         },
         {
-            element: '.filterstep4',
+            element: '.timeBackControls',
             intro: 'Select the number of hours back from the selected date/time desired.',
             position: 'right'
         },
         {
-            element: '.filterstep5',
+            element: '.submitControl',
             intro: 'Click the "Apply" button when settings are as desired.',
             position: 'right'
         }],
@@ -452,8 +435,5 @@ angular
       this.toggle('algonav');
       originatorEv = null;
     };
-
-    // add timeline to the DOM
-    //mapTimeline();
 
   });

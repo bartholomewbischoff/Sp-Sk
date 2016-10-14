@@ -77,7 +77,7 @@ angular
             button.addEventListener('touchstart', handleRotate90, false);
 
             var element = document.createElement('div');
-            element.className = 'step7 rotate-90 ol-unselectable ol-control';
+            element.className = 'rotate-90 ol-unselectable ol-control';
             element.appendChild(button);
 
             ol.control.Control.call(this, {

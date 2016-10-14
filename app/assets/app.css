@@ -13,11 +13,6 @@ html, body {
 }
 
 /* Timeline ----------------------------------------------*/
-/*.timeLine md-list-item {
-  padding: 0px 2px 0px 2px;
-  width: 30px;
-  height: 40px;
-}*/
 
 .timeLineScrollBox {
   height: inherit;
@@ -34,10 +29,18 @@ html, body {
 }
 
 .timeLineButtons span{
-      /*padding: 0 0 0 16px;*/
-      display:table;
-      margin-left: auto;
-      margin-right: auto;
+  display:table;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.timeLine #horizontal-container {
+  height: 64px;
+  width: 95%;
+}
+
+.timeLineButtons {
+  margin-right: 10px;
 }
 
 /* Toasts ------------------------------------------------*/
@@ -63,7 +66,7 @@ md-toast {
   margin-bottom: auto;
 }
 
-.control {
+.sensorControls, .timeBackControls {
   padding-bottom: 40px;
 }
 
