@@ -27,7 +27,7 @@
     </style>
 
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="./src/scrollbox.js"></script>
+    <script src="./src/jquery.slimscroll.js"></script>
 
     <script src="../node_modules/angular/angular.js"></script>
     <script src="../node_modules/angular-animate/angular-animate.js"></script>
@@ -52,7 +52,7 @@
   <body ng-cloak layout="column" ng-controller="MainController as ctrl" >
 
     <!-- Container #1 - Main container on app -->
-    <div flex layout="column" ng-intro-options="HelpOptions" ng-intro-method="CallMe" ng-intro-autostart="false">
+    <div flex layout="column" ng-intro-options="helpSettings" ng-intro-method="CallMe" ng-intro-autostart="false">
 
       <section layout="column" flex>
 
@@ -67,14 +67,14 @@
             <md-list>
             
               <md-list-item >
-                <md-button ng-click="ctrl.helpOverlayIntro()">
+                <md-button ng-click="ctrl.mainHelp()">
                   <md-icon md-svg-icon="livehelp" class="avatar"></md-icon>
                   {{ data.selectedApp.name }} Tutorial
                 </md-button>
               </md-list-item>
 
               <md-list-item >
-                <md-button ng-click="ctrl.phenomHelpOptions()">
+                <md-button ng-click="ctrl.phenomHelp()">
                   <md-icon md-svg-icon="satellite" class="avatar"></md-icon>
                   Phenomenology Tutorial
                 </md-button>
@@ -92,12 +92,25 @@
 
         </md-sidenav>
 
+        <!-- SideNav for Settings Options -->
+        <md-sidenav md-component-id="settingsnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
+
+          <md-toolbar layout="row">
+            <h1 class="md-toolbar-tools">Application Settings</h1>
+          </md-toolbar>
+        
+          <md-content layout-padding>
+            
+          </md-content>
+
+        </md-sidenav>
+
         <!-- SideNav for Filter Options -->
         <md-sidenav md-component-id="filternav" class="filternav md-sidenav-left md-whiteframe-z2 md-closed">
           
           <md-toolbar layout="row">
             <h1 class="md-toolbar-tools">Filter Options</h1>
-            <md-button class="menuButton" ng-click="ctrl.filterHelpOverlayIntro()" aria-label="Show filter List" style="margin-right: 0px; margin-left: auto;">
+            <md-button class="menuButton" ng-click="ctrl.filterHelp()" aria-label="Show filter List" style="margin-right: 0px; margin-left: auto;">
               <md-icon md-svg-icon="help" ></md-icon>
             </md-button>
           </md-toolbar>
@@ -106,7 +119,7 @@
             <form ng-submit="submit()">
                 
                 <!-- Sensor Option -->
-                <div class="control">
+                <div class="sensorControls">
                     <h2>Sensor</h2>
                     <md-radio-group layout="row" ng-model="data.defaultSatelliteOption" style="margin-left:10px;" class="filterstep1">
                         <md-radio-button ng-repeat="sats in data.availableSensors"
@@ -115,26 +128,12 @@
                         {{ sats.name }}<br/>
                     </md-radio-group>
                 </div>
-                
-                <!-- AOI Option -->
-                <div layout="column" ng-if="data.selectedApp.id == 2">
-                  <h2>AOI</h2>
-                  <md-input-container flex="80" style="margin-left:10px; width:300px;" class="filterstep2">
-                    <label>Area</label>
-                    <md-select name="aoi" ng-model="data.defaultAOI" required>
-                      <md-option>None</md-option>
-                      <md-option ng-repeat="area in data.availableAois" ng-value="area.id" ng-disabled="area.isDisabled">
-                        {{area.name}}
-                      </md-option>
-                    </md-select>
-                  </md-input-container>
-                </div>
 
                 <!-- Date/Time Option -->
-                <div layout="column">
+                <div class="timeControls" layout="column">
                   <h2>Date/Time</h2>
                   
-                  <div class="filterstep3">
+                  <!--<div class="filterstep3">-->
                     <md-checkbox style="margin-left:10px;" ng-checked="" ng-model="data.liveFeedSelected" ng-click="" aria-label="Live Feed Option">
                       Live Feed
                     </md-checkbox>
@@ -150,13 +149,13 @@
                             <input type="time" name="usr_time" value="13:00">
                         </md-input-container>
                     </div>
-                  </div>
+                  <!--</div>-->
                 </div>
                 
                 <!-- Time Back Option -->
-                <div class="control">
+                <div class="timeBackControls">
                     <h2>Time Back</h2>
-                    <md-input-container flex="80" style="margin-left:10px; width:300px;" class="filterstep4">
+                    <md-input-container flex="80" style="margin-left:10px; width:300px;">
                       <label>Time Back</label>
                       <md-select name="delta" ng-model="data.defaultDelta" required>
                         <md-option ng-repeat="delta in data.validDeltas" ng-value="delta.id" ng-disabled="delta.isDisabled">
@@ -166,7 +165,7 @@
                     </md-input-container>
                 </div>
 
-                <md-button class="md-raised filterstep5" ng-click="ctrl.toggle('filternav')" type="button">Apply</md-button>
+                <md-button class="md-raised submitControl" ng-click="ctrl.toggle('filternav')" type="button">Apply</md-button>
 
             </form>
           </md-content>
@@ -179,52 +178,52 @@
           <!-- Container #5 - top row of Container #3 -->
           <md-toolbar layout="row">
             <h1 class="md-toolbar-tools">Algorithms</h1>
-            <md-button class="algoButton menuButton" ng-click="ctrl.algoHelpOverlayIntro()" aria-label="Show Algorithm List" style="margin-right: 0px; margin-left: auto;">
+            <md-button class="algoButton menuButton" ng-click="ctrl.algoHelp()" aria-label="Show Algorithm List" style="margin-right: 0px; margin-left: auto;">
               <md-icon md-svg-icon="help" ></md-icon>
             </md-button>
           </md-toolbar>
 
           <md-content>
             <md-list>
-              <md-list-item class="algostep1">
+              <md-list-item class="hemiMenuButton">
                 <md-button ng-click="ctrl.hemiMenu()">
                   <md-icon md-svg-icon="menu" class="avatar"></md-icon>
-                  Algorithm 1
+                  HEMI
                 </md-button>
               </md-list-item>
             
-              <md-list-item class="algostep2">
+              <md-list-item class="monsoonMenuButton">
                 <md-button ng-click="ctrl.monsoonMenu()">
                   <md-icon md-svg-icon="menu" class="avatar"></md-icon>
                   MONSOON
                 </md-button>
               </md-list-item>
             
-              <md-list-item class="algostep3">
+              <md-list-item class="arapahoMenuButton">
                 <md-button ng-click="ctrl.arapahoMenu()">
                   <md-icon md-svg-icon="menu" class="avatar"></md-icon>
                   ARAPAHO
                 </md-button>
               </md-list-item>
             
-              <md-list-item class="algostep4">
+              <md-list-item class="stereoMenuButton">
                 <md-button ng-click="ctrl.stereoMenu()">
                   <md-icon md-svg-icon="menu" class="avatar"></md-icon>
-                  Algorithm 4
+                  STEREO
                 </md-button>
               </md-list-item>
 
-              <md-list-item class="algostep5">
+              <md-list-item class="giftMenuButton">
                 <md-button ng-click="ctrl.giftMenu()">
                   <md-icon md-svg-icon="menu" class="avatar"></md-icon>
-                  Algorithm 5
+                  GIFT
                 </md-button>
               </md-list-item>
 
-              <md-list-item class="algostep6">
+              <md-list-item class="gossMenuButton">
                 <md-button ng-click="ctrl.gossMenu()">
                   <md-icon md-svg-icon="menu" class="avatar"></md-icon>
-                  Algorithm 6
+                  GOSS
                 </md-button>
               </md-list-item>
             </md-list>
@@ -316,21 +315,29 @@
         </md-toolbar>
 
         <!-- Container #2 - Top toolbar in Container #1 -->
-        <md-toolbar layout="row"  layout-align="start center" class="md-primary md-hue-2">
+        <md-toolbar layout="row"  layout-sm="column" layout-align="start center" class="md-primary md-hue-2">
 
           <!-- Trigger element for Algorithm menu -->
-          <md-button class="menuButton step1" ng-click="ctrl.toggle('algonav')" aria-label="Show Algorithm List" style="margin-left: 0px;">
+          <md-button class="menuButton algoMenuButton" ng-click="ctrl.toggle('algonav')" aria-label="Show Algorithm List" style="margin-left: 0px;">
             <md-icon md-svg-icon="algo" ></md-icon>
           </md-button>
 
           <!-- Trigger element for Filter menu -->
-          <md-button class="menuButton step2" ng-click="ctrl.toggle('filternav')" aria-label="Show Filter Options" style="margin-right: auto; margin-left: 0px;">
+          <md-button class="menuButton filterMenuButton" ng-click="ctrl.toggle('filternav')" aria-label="Show Filter Options" style="margin-right: auto; margin-left: 0px;">
             <md-icon md-svg-icon="filter" ></md-icon>
           </md-button>
 
+          <!-- Span holder for possibly adding user accounts -->
+          <span style="font-size: small;">John Smith</span>
+
           <!-- Button to open the help options sidenav -->
-          <md-button ng-click="ctrl.toggle('helpnav')" class="menuButton md-primary" aria-label="Open Help Overlay" style="margin-right: 0px;">
+          <md-button ng-click="ctrl.toggle('helpnav')" class="menuButton helpMenuButton" aria-label="Open Help Overlay" style="margin-right: 0px;">
             <md-icon md-menu-origin md-svg-icon="help"></md-icon>
+          </md-button>
+
+          <!-- Button to open the settings sidenav -->
+          <md-button ng-click="ctrl.toggle('settingsnav')" class="menuButton settingsMenuButton" aria-label="Open Settings Sidenav" style="margin-right: 0px;">
+            <md-icon md-menu-origin md-svg-icon="settings"></md-icon>
           </md-button>
 
         </md-toolbar>
@@ -342,22 +349,22 @@
           <div class="map" id="map" style="background-color:black">
 
             <!-- Container #5 - toolbar at top of Container #3 -->
-            <md-toolbar layout="row" layout-align="start center" class="md-primary">
+            <md-toolbar layout="row" layout-md="column" layout-sm="column" layout-align="start center" class="md-primary">
               <!-- Controls that create a product -->
               <div class="productControls" layout="row">
 
                 <!-- Button to view sattellite info -->
-                <md-button ng-click="showSatelliteToast()" class="menuButton md-primary" aria-label="View Satellite Location" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-click="showSatelliteToast()" class="menuButton satFootButton" aria-label="View Satellite Location" style="margin-right: 0px; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="earth2"></md-icon>
                 </md-button>
 
                 <!-- Button to create movie -->
-                <md-button ng-click="" class="menuButton md-primary" aria-label="Create movie" style="margin-right: 0px; margin-left: 0px;">
+                <md-button ng-click="" class="menuButton movieMenuButton" aria-label="Create movie" style="margin-right: 0px; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="movie"></md-icon>
                 </md-button>
 
                 <!-- Button to take image -->
-                <md-button ng-click="" class="menuButton md-primary" aria-label="Create image" style="margin-right: auto; margin-left: 0px;">
+                <md-button ng-click="" class="menuButton photoMenuButton" aria-label="Create image" style="margin-right: auto; margin-left: 0px;">
                   <md-icon md-menu-origin md-svg-icon="photo"></md-icon>
                 </md-button>
 
@@ -399,27 +406,13 @@
               </div>
 
               <!-- Controls that handle options for the images -->
-              <div class="timeLine" layout='row'>
-                
-                <md-button class="timeLineScrollBack" aria-label="Front of image stack" style="margin-right: 0px; margin-left: auto;">
-                  <md-icon md-svg-icon="leftarrow"></md-icon>
-                </md-button>
+              <div class="timeLine">
 
-                <div class="timeLineScrollBox" layout='row' layout-align="center center" flex>
-                  <md-list layout='row'>
-                    <md-list-item ng-repeat="item in testcurrentImages">
-                      <md-button class="md-fab md-mini md-primary timeLineButtons" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item.id)" aria-label="Image Button {{ item.id }}" value="{{ item.id }}" style="margin-right: 0px; margin-left: auto;">
-                        <!-- <md-icon ng-if="item.id % 2 == 0" md-svg-icon="close"></md-icon> -->
-                        <!-- <md-icon ng-if="item.id % 2 != 0" md-svg-icon="redrect"></md-icon> -->
-                        {{ item.id }}
-                      </md-button>
-                    </md-list-item>
-                  </md-list>
+                <div id="horizontal-container">
+                  <md-button class="md-fab md-mini md-primary timeLineButtons" ng-repeat="item in testcurrentImages" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item.id)" aria-label="Image Button {{ item.id }}" value="{{ item.id }}">
+                    {{ item.id }}
+                  </md-button>
                 </div>
-
-                <md-button class="timeLineScrollFwd" aria-label="End of image stack" style="margin-right: auto; margin-left: 0px;">
-                  <md-icon md-svg-icon="rightarrow"></md-icon>
-                </md-button>
 
               </div>
 
