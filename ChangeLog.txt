@@ -1,3 +1,30 @@
+10/21/2016
+-------------------------------------------------------
+	- added playback speed selection option to the application settings sidenav
+	- redesigned layout per guidelines provided
+		- 2nd toolbar moved to the bottom
+		- larger play icon added
+		- moved satellite widget button to the top toolbar
+		- moved which side of the screen the satellite widget opens on
+		- added logic so that the filter sidenav is open by default and is still overlaid on the page
+		- removed excessive rotation buttons from the openlayers map
+		- adjusted the 90 degree rotation button to add 90 degrees to the maps rotation no matter how many times it is clicked
+		- changed the icon on the 90 degree rotation button
+		- removed the full screen control from the openlayers map
+		
+	- adjusted appearance of filter sidenav
+	- linked timeline buttons to change style depending on which image is displayed
+	- added an attribution to the openlayers map tiles
+	- added right click functionality to the timeline buttons.  This allows the user to select whether a tile is included in the moviemaker or not.  
+		The buttons style changes based on whether it is selected or not for the moviemaker.
+
+10/14/2016
+-------------------------------------------------------
+	- added movie icon to the products controls area on the map toolbar
+	- added photo icon to the products controls area on the map toolbar 
+	- cleaned up timeline and linked to the map imagery
+	- added logic for the play controls
+
 10/7/2016
 -------------------------------------------------------
 	- added satellite location icon to open angular toast
@@ -68,3 +95,4 @@
 	- added algorithm, help, filter buttons
 	- downloaded and imported multiple icons
 	- started with angularjs material tutorial app and cut out unnecessary code
+
