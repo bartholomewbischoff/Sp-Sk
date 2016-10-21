@@ -15,6 +15,7 @@ angular
         this.centerValue = [DefaultConfigs.optionDefaults.x, DefaultConfigs.optionDefaults.y];
         this.currentCenterValue = this.centerValue;
         this.currentRotationValue = 0;
+        this.tileAttribution = new ol.Attribution({ html: '<img src="./assets/images/af.png"> <img src="./assets/images/nasic.png">'});
 
         // creates a map projection
         this.createProjection = function() {
@@ -31,10 +32,10 @@ angular
             imageLayer = new ol.layer.Tile({
                 preload: Infinity,
                 source: new ol.source.XYZ({
-                    //url: 'http://127.0.0.1:8888/{z}-{y}-{x}.png',
                     url: this.baseURL + this.currentImages[ind] + '/{z}-{y}-{x}.png',
                     projection: this.proj,
-                    wrapX: false
+                    wrapX: false,
+                    attributions: [this.tileAttribution]
                 }),
                 transitionEffect: 'resize',
                 visible: isVisible
@@ -66,11 +67,12 @@ angular
         this.RotateCW90 = function(opt_options) {
             var options = opt_options || {};
             var button = document.createElement('button');
-            button.innerHTML = '90°';
+            button.innerHTML = '<img src="./assets/svg/rotate_90_18px.svg" alt="Rotate 90" >';
             var this_ = this;
 
             var handleRotate90 = function() {
-                this_.getMap().getView().setRotation(Math.PI/2);
+                var temp = this_.getMap().getView().getRotation()
+                this_.getMap().getView().setRotation(temp + Math.PI/2);
             };
 
             button.addEventListener('click', handleRotate90, false);
@@ -88,82 +90,18 @@ angular
 
         ol.inherits(this.RotateCW90, ol.control.Control);
 
-        // 180° rotation controls
-        this.Rotate180 = function(opt_options) {
-            var options = opt_options || {};
-            var button = document.createElement('button');
-            button.innerHTML = '180°';
-            var this_ = this;
-
-            var handleRotate180 = function() {
-                this_.getMap().getView().setRotation(Math.PI);
-            };
-
-            button.addEventListener('click', handleRotate180, false);
-            button.addEventListener('touchstart', handleRotate180, false);
-
-            var element = document.createElement('div');
-            element.className = 'step7 rotate-180 ol-unselectable ol-control';
-            element.appendChild(button);
-
-            ol.control.Control.call(this, {
-                element: element,
-                target: options.target
-            });
-        };
-
-        ol.inherits(this.Rotate180, ol.control.Control);
-
-        // 270° rotation controls
-        this.Rotate270 = function(opt_options) {
-            var options = opt_options || {};
-            var button = document.createElement('button');
-            button.innerHTML = '270°';
-            var this_ = this;
-
-            var handleRotate270 = function() {
-                console.log(this_)
-                this_.getMap().getView().setRotation(1.5 * Math.PI);
-            };
-
-            button.addEventListener('click', handleRotate270, false);
-            button.addEventListener('touchstart', handleRotate270, false);
-
-            var element = document.createElement('div');
-            element.className = 'step7 rotate-270 ol-unselectable ol-control';
-            element.appendChild(button);
-
-            ol.control.Control.call(this, {
-                element: element,
-                target: options.target
-            });
-        };
-
-        ol.inherits(this.Rotate270, ol.control.Control);
-
         // creates an openlayers map
         this.createMap = function(target) {
             this.createProjection();
             this.buildLayers();
-
-            var logoElement = document.createElement('a');
-            logoElement.href = 'http://www.osgeo.org/';
-            logoElement.target = '_blank';
-
-            var logoImage = document.createElement('img');
-            logoImage.src = 'https://www.osgeo.org/sites/all/themes/osgeo/logo.png';
-
-            logoElement.appendChild(logoImage);
 
             this.map = new ol.Map({
                 layers: this.layers,
                 target: target,
                 renderer: 'canvas',
                 controls: ol.control.defaults().extend([
-                    new ol.control.FullScreen(),
-                    new this.RotateCW90(),
-                    new this.Rotate180(),
-                    new this.Rotate270()
+                    //new ol.control.FullScreen(),
+                    new this.RotateCW90()
                 ]),
                 view: new ol.View({
                     center: this.currentCenterValue,
@@ -171,8 +109,7 @@ angular
                     maxZoom: 5,
                     projection: DefaultConfigs.getProjection(),
                     rotation: this.currentRotationValue
-                }),
-                logo: logoElement
+                })
             });
         }
 

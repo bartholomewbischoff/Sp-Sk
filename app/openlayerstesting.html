@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Attributions</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v3.18.2/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v3.18.2/build/ol.js"></script>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+
+      var infoLabel = document.createElement('span');
+      infoLabel.textContent = 'i';
+
+      var attribution = new ol.control.Attribution({
+        collapsible: true,
+        label: infoLabel
+      });
+
+      var map = new ol.Map({
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        ],
+        controls: ol.control.defaults({attribution: false}).extend([attribution]),
+        target: 'map',
+        view: new ol.View({
+          center: [0, 0],
+          zoom: 2
+        }),
+        logo: {
+          src: './assets/images/nasic.png',
+          href: 'spectre@nasic.wrightpatterson.af.smil.mil'
+        }
+      });
+
+      window.addEventListener('resize', checkSize);
+      checkSize();
+    </script>
+  </body>
+</html>

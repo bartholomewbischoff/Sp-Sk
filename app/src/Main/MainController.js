@@ -7,32 +7,83 @@ angular
     //$scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}];
     $scope.lenCurrentImages = $scope.testcurrentImages.length;
     var isDlgOpen;
+    $scope.remainingImages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
 
     $scope.data = DefaultConfigs;
     $scope.playStatus = false;
     $scope.helpSettings;
 
     // delays initialization of the openlayers map until page is ready
-    angular.element(document.querySelector('#map')).ready(function () {
+    window.onload = function() {
         setTimeout(
             function() {
                 initializeMap();
+                toggling('filternav');
             }, 5);
 
         $('#horizontal-container').slimscroll({
             alwaysVisible: true,
-            height: '64px',
+            height: '45px',
             width: '95%',
             axis: 'x'
         });
-    });
+    };
+ 
+    // sidenav toggle function available to the controller
+    var toggling = function(navID) {
+      $mdSidenav(navID).toggle();
+    };
+
+    // function to alter movie id array on right click
+    $scope.rightClick = function(ind) {
+        console.log("I was right clicked = " + ind);
+        console.log("Remaining = " + $scope.remainingImages);
+        console.log( ($.inArray((ind), $scope.remainingImages)) );
+        if( ($.inArray((ind), $scope.remainingImages)) != -1 || ($.inArray((ind), $scope.remainingImages)) > -1 ) {
+            $scope.remainingImages.splice( $.inArray(ind, $scope.remainingImages) , 1 );
+            console.log("Remaining = " + $scope.remainingImages);
+        } else {
+            $scope.remainingImages.push(ind);
+            console.log("Remaining = " + $scope.remainingImages);
+        };
+    };
+
+    // function to change style on timeline button on click  
+    $scope.selectedGetClass = function(ind){
+
+        if( ($.inArray((ind), $scope.remainingImages)) == -1 ){
+            if( ind == (MapService.currentIter + 1) ) {
+                return "selected"
+            } 
+            return "removed"
+        } else if( ind == (MapService.currentIter + 1) ) {
+            return "selected"
+        } else {
+            return ""
+        }
+    }
+
+    // save the application settings
+    this.saveSettings = function() {
+        if ($scope.settingsForm.$valid) {
+            $scope.data.updateInterval = $scope.settingsForm.speed.$modelValue * DefaultConfigs.updateInterval;
+        }
+        console.log('Settings were saved ...');
+        this.toggle('settingsnav');
+    }
+
+    // save the filter settings
+    this.saveFilter = function() {
+        console.log('Filter settings were saved ...');
+        this.toggle('filternav');
+    }
     
     // creates a toast to hold the satellite location info
     $scope.showSatelliteToast = function() {
         $mdToast.show({
           hideDelay   : 40000,
           parent      : '.map',
-          position    : 'bottom left',
+          position    : 'bottom right',
           controller  : 'MainController',
           templateUrl : 'satelliteToast.html'
         });
@@ -41,7 +92,6 @@ angular
 
     // controls the opening and closing of the satellite toast
     $scope.closeSatelliteToast = function() {
-        console.log('testing');
         if (isDlgOpen) return;
 
         $mdToast
@@ -58,7 +108,7 @@ angular
         console.log("The map was initialized ...");
     };
 
-    // update the map
+    // update the openlayers map
     var updateMap = function() {
         MapService.updateCurrentRotation();
         MapService.updateCurrentZoom();
@@ -66,10 +116,8 @@ angular
         MapService.setVisibility();
     }
 
-    // function to display selected image in timeline
+    // function to display image based on selection in timeline
     this.gotoImage = function(id) {
-        console.log("I was clicked");
-        console.log(id);
         MapService.prevIter = MapService.currentIter;
         MapService.currentIter = id - 1;
         MapService.updateCurrentRotation();
@@ -82,7 +130,7 @@ angular
         var mapani = this;
         animationRunner = $interval(function() {
             mapani.forwardOption();
-        }, DefaultConfigs.updateInterval);
+        }, $scope.data.updateInterval);
     };
 
     // function to move forward one image
@@ -436,4 +484,15 @@ angular
       originatorEv = null;
     };
 
-  });
+  })
+  .directive('ngRightClick', function($parse) {
+    return function(scope, element, attrs) {
+        var fn = $parse(attrs.ngRightClick);
+        element.bind('contextmenu', function(event) {
+            scope.$apply(function() {
+                event.preventDefault();
+                fn(scope, {$event:event});
+            });
+        });
+    };
+});

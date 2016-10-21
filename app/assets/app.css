@@ -14,33 +14,31 @@ html, body {
 
 /* Timeline ----------------------------------------------*/
 
-.timeLineScrollBox {
-  height: inherit;
-  overflow: hidden;
-}
-
-.timeLineScrollBox md-list {
-  margin: 0px auto 0px auto;
-}
-
-.timeLineScrollBox md-icon {
-  position: relative;
-  left: 26px;
-}
-
 .timeLineButtons span{
-  display:table;
+  display: table;
   margin-left: auto;
   margin-right: auto;
 }
 
 .timeLine #horizontal-container {
-  height: 64px;
+  height: 45px;
   width: 95%;
 }
 
 .timeLineButtons {
   margin-right: 10px;
+  line-height: 26px !important;
+  width: 26px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+}
+
+.selected {
+  background-color: rgb(245, 226, 4) !important;
+}
+
+.removed {
+  background-color: rgb(249, 0, 0) !important;
 }
 
 /* Toasts ------------------------------------------------*/
@@ -54,7 +52,7 @@ md-toast {
   padding: 0px 5px 10px 5px;
 }
 
-/* Toolbar area ------------------------------------------------*/
+/* Toolbars ------------------------------------------------*/
 
 .menuButton {
   background-color: transparent;
@@ -66,8 +64,13 @@ md-toast {
   margin-bottom: auto;
 }
 
-.sensorControls, .timeBackControls {
+.sensorControls, .timeControls, .timeBackControls {
   padding-bottom: 40px;
+  border-bottom: 2px solid rgb(189,189,189);
+}
+
+.submitControl {
+      margin-top: 20px;
 }
 
 md-menu-item .md-button {
@@ -104,11 +107,9 @@ md-toolbar.classification2 {
   min-height: 16px !important;
 }
 
-md-toolbar .search input {
-  border: none;
-  outline: none;
-  margin-left: 10px;
-  background-color: rgb(85, 161, 216);
+.controlsToolbar {
+  min-height: 45px !important;
+  height: 45px;
 }
 
 .productControls {
@@ -143,7 +144,7 @@ md-sidenav  md-list {
 }
 
 .filternav {
-  width: 450px;
+  width: 390px;
 }
 
 .infonav {
@@ -154,8 +155,7 @@ md-sidenav  md-list {
 /* Primary content area -----------------------------------------------*/
 
 #content {
-  overflow: hidden;
-  background-color: black;
+  height: 100%;
 }
 
 #content .md-button.share {
@@ -189,6 +189,8 @@ md-button.menuBtn > md-icon {
 }
 
 #content #map {
+  overflow: hidden;
+  background-color: black;
   display: block;
   position: absolute;
   width: 100%;
@@ -248,15 +250,9 @@ md-dialog-content {
 }
 
 .ol-rotate {
-  margin-top: 163px;
-  left:.5em;
+  margin-top: 95px;
+  left: .5em;
   right: auto !important;
-}
-
-.mapClass {
-  position: absolute;
-  bottom: 0px; 
-  z-index: 10000;
 }
 
 .rotate-90 {
@@ -268,25 +264,7 @@ md-dialog-content {
   top: 80px;
 }
 
-.rotate-180 {
-  top: 100px;
-  left: .5em;
-}
-
-.ol-touch .rotate-180 {
-  top: 120px;
-}
-
-.rotate-270 {
-  top: 135px;
-  left: .5em;
-}
-
-.ol-touch .rotate-270 {
-  top: 160px;
-}
-
-.ol-control.rotate-90>button, .ol-control.rotate-180>button, .ol-control.rotate-270>button {
+.ol-control.rotate-90>button {
   font-size: xx-small;
   width: 21.94px;
   height: 21.94px;

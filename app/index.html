@@ -32,7 +32,7 @@
     <script src="../node_modules/angular/angular.js"></script>
     <script src="../node_modules/angular-animate/angular-animate.js"></script>
     <script src="../node_modules/angular-aria/angular-aria.js"></script>
-    <script src="../node_modules/openlayers/build/ol-custom.js"></script>
+    <!-- <script src="../node_modules/openlayers/build/ol-custom.js"></script> -->
     <script src="../node_modules/angular-material/angular-material.js"></script>
     <script src="../node_modules/angular-intro.js/intro.js"></script>
     <script src="../node_modules/angular-intro.js/angular-intro.js"></script>
@@ -45,7 +45,7 @@
     <script src="//d3js.org/d3.v3.min.js"></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
 
-    <!-- <script src="http://openlayers.org/en/v3.18.2/build/ol.js"></script> -->
+    <script src="http://openlayers.org/en/v3.18.2/build/ol.js"></script>
 
   </head>
 
@@ -54,7 +54,46 @@
     <!-- Container #1 - Main container on app -->
     <div flex layout="column" ng-intro-options="helpSettings" ng-intro-method="CallMe" ng-intro-autostart="false">
 
-      <section layout="column" flex>
+      <!-- Top Classification Bar -->
+      <md-toolbar layout="row"  layout-align="start center" class="md-primary md-hue-2 classification1">
+        <div class="text1" style="margin-right: auto; margin-left: auto;"> {{ data.classificationText }} </div>
+      </md-toolbar>
+
+      <!-- Container #2 - Top toolbar in Container #1 -->
+      <md-toolbar layout="row"  layout-sm="column" layout-align="start center" class="md-primary md-hue-2">
+
+        <!-- Trigger element for Filter menu -->
+        <md-button class="menuButton filterMenuButton" ng-click="ctrl.toggle('filternav')" aria-label="Show Filter Options" style="margin-left: 0px;">
+          <md-icon md-svg-icon="filter" ></md-icon>
+        </md-button>
+
+        <!-- Trigger element for Algorithm menu -->
+        <md-button class="menuButton algoMenuButton" ng-click="ctrl.toggle('algonav')" aria-label="Show Algorithm List" style="margin-left: 0px;">
+          <md-icon md-svg-icon="algo" ></md-icon>
+        </md-button>
+
+        <!-- Button to view sattellite info -->
+        <md-button ng-click="showSatelliteToast()" class="menuButton satFootButton" aria-label="View Satellite Location" style="margin-right: auto; margin-left: 0px;">
+          <md-icon md-menu-origin md-svg-icon="earth2"></md-icon>
+        </md-button>
+
+        <!-- Span holder for possibly adding user accounts -->
+        <span style="font-size: small; margin: 20px;">John Smith</span>
+
+        <!-- Button to open the help options sidenav -->
+        <md-button ng-click="ctrl.toggle('helpnav')" class="menuButton helpMenuButton" aria-label="Open Help Overlay" style="margin-right: 0px;">
+          <md-icon md-menu-origin md-svg-icon="help"></md-icon>
+        </md-button>
+
+        <!-- Button to open the settings sidenav -->
+        <md-button ng-click="ctrl.toggle('settingsnav')" class="menuButton settingsMenuButton" aria-label="Open Settings Sidenav" style="margin-right: 0px;">
+          <md-icon md-menu-origin md-svg-icon="settings"></md-icon>
+        </md-button>
+
+      </md-toolbar>
+        
+      <!-- Container #3 - Content holder in Container #1 -->
+      <md-content id="content">
 
         <!-- SideNav for Help Options -->
         <md-sidenav md-component-id="helpnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
@@ -100,13 +139,32 @@
           </md-toolbar>
         
           <md-content layout-padding>
-            
+            <form name="settingsForm">
+                
+                <!-- Time Back Option -->
+                <div class="playSpeed">
+                    <h2>Play Speed</h2>
+                    <md-input-container flex="80" style="margin-left:10px; width:300px;">
+                      <label>Playback Speed</label>
+                      <md-select name="speed" ng-model="playspeed">
+                        <md-option ng-value=".25">4x Faster</md-option>
+                        <md-option ng-value=".5">2x Faster</md-option>
+                        <md-option ng-value="1">Default Speed</md-option>
+                        <md-option ng-value="2">2x Slower</md-option>
+                        <md-option ng-value="4">4x Slower</md-option>
+                      </md-select>
+                    </md-input-container>
+                </div>
+
+                <md-button class="md-raised" ng-click="ctrl.saveSettings()" type="button">Apply</md-button>
+
+            </form>
           </md-content>
 
         </md-sidenav>
 
         <!-- SideNav for Filter Options -->
-        <md-sidenav md-component-id="filternav" class="filternav md-sidenav-left md-whiteframe-z2 md-closed">
+        <md-sidenav layout="column" layout-fill md-component-id="filternav" md-is-locked-open="sideNavOpen" class="filternav md-sidenav-left md-whiteframe-z2" md-disable-backdrop="true">
           
           <md-toolbar layout="row">
             <h1 class="md-toolbar-tools">Filter Options</h1>
@@ -115,8 +173,8 @@
             </md-button>
           </md-toolbar>
 
-          <md-content flex layout-padding>
-            <form ng-submit="submit()">
+          <md-content flex layout="column" layout-padding layout-fill>
+            <form layout="column" layout-fill name="filterForm" ng-submit="submit()">
                 
                 <!-- Sensor Option -->
                 <div class="sensorControls">
@@ -165,7 +223,7 @@
                     </md-input-container>
                 </div>
 
-                <md-button class="md-raised submitControl" ng-click="ctrl.toggle('filternav')" type="button">Apply</md-button>
+                <md-button class="md-raised submitControl" ng-click="ctrl.saveFilter()" type="button">Apply</md-button>
 
             </form>
           </md-content>
@@ -308,126 +366,83 @@
           </md-content>
           
         </md-sidenav>
-
-        <!-- Top Classification Bar -->
-        <md-toolbar layout="row"  layout-align="start center" class="md-primary md-hue-2 classification1">
-          <div class="text1" style="margin-right: auto; margin-left: auto;"> {{ data.classificationText }} </div>
-        </md-toolbar>
-
-        <!-- Container #2 - Top toolbar in Container #1 -->
-        <md-toolbar layout="row"  layout-sm="column" layout-align="start center" class="md-primary md-hue-2">
-
-          <!-- Trigger element for Algorithm menu -->
-          <md-button class="menuButton algoMenuButton" ng-click="ctrl.toggle('algonav')" aria-label="Show Algorithm List" style="margin-left: 0px;">
-            <md-icon md-svg-icon="algo" ></md-icon>
-          </md-button>
-
-          <!-- Trigger element for Filter menu -->
-          <md-button class="menuButton filterMenuButton" ng-click="ctrl.toggle('filternav')" aria-label="Show Filter Options" style="margin-right: auto; margin-left: 0px;">
-            <md-icon md-svg-icon="filter" ></md-icon>
-          </md-button>
-
-          <!-- Span holder for possibly adding user accounts -->
-          <span style="font-size: small;">John Smith</span>
-
-          <!-- Button to open the help options sidenav -->
-          <md-button ng-click="ctrl.toggle('helpnav')" class="menuButton helpMenuButton" aria-label="Open Help Overlay" style="margin-right: 0px;">
-            <md-icon md-menu-origin md-svg-icon="help"></md-icon>
-          </md-button>
-
-          <!-- Button to open the settings sidenav -->
-          <md-button ng-click="ctrl.toggle('settingsnav')" class="menuButton settingsMenuButton" aria-label="Open Settings Sidenav" style="margin-right: 0px;">
-            <md-icon md-menu-origin md-svg-icon="settings"></md-icon>
-          </md-button>
-
-        </md-toolbar>
         
-        <!-- Container #3 - Content holder in Container #1 -->
-        <md-content flex id="content">
-          
-          <!-- Container #4 - map holder in Container #3 -->
-          <div class="map" id="map" style="background-color:black">
+        <!-- Container #4 - map holder in Container #3 -->
+        <div class="map" id="map" style="background-color:black">
 
-            <!-- Container #5 - toolbar at top of Container #3 -->
-            <md-toolbar layout="row" layout-md="column" layout-sm="column" layout-align="start center" class="md-primary">
-              <!-- Controls that create a product -->
-              <div class="productControls" layout="row">
+        </div>
 
-                <!-- Button to view sattellite info -->
-                <md-button ng-click="showSatelliteToast()" class="menuButton satFootButton" aria-label="View Satellite Location" style="margin-right: 0px; margin-left: 0px;">
-                  <md-icon md-menu-origin md-svg-icon="earth2"></md-icon>
-                </md-button>
+      </md-content>
 
-                <!-- Button to create movie -->
-                <md-button ng-click="" class="menuButton movieMenuButton" aria-label="Create movie" style="margin-right: 0px; margin-left: 0px;">
-                  <md-icon md-menu-origin md-svg-icon="movie"></md-icon>
-                </md-button>
+      <!-- Container #5 - toolbar at top of Container #3 -->
+      <md-toolbar layout="row" layout-md="column" layout-sm="column" layout-align="start center" class="controlsToolbar md-primary md-hue-2">
+        <!-- Controls that create a product -->
+        <div class="productControls" layout="row">
 
-                <!-- Button to take image -->
-                <md-button ng-click="" class="menuButton photoMenuButton" aria-label="Create image" style="margin-right: auto; margin-left: 0px;">
-                  <md-icon md-menu-origin md-svg-icon="photo"></md-icon>
-                </md-button>
+          <!-- Button to create movie -->
+          <md-button ng-click="" class="menuButton movieMenuButton" aria-label="Create movie" style="margin-right: 0px; margin-left: 0px;">
+            <md-icon md-menu-origin md-svg-icon="movie"></md-icon>
+          </md-button>
 
-              </div>
+          <!-- Button to take image -->
+          <md-button ng-click="" class="menuButton photoMenuButton" aria-label="Create image" style="margin-right: auto; margin-left: 0px;">
+            <md-icon md-menu-origin md-svg-icon="photo"></md-icon>
+          </md-button>
 
-              <!-- Controls that handle which image is shown -->
-              <div class="playControls" layout="row">
+        </div>
 
-                <!-- Button to goto first image -->
-                <md-button ng-click="ctrl.startOption()" ng-disabled="playStatus" class="menuButton md-primary mapFirst" aria-label="First image control" style="margin-right: 0px; margin-left: auto;">
-                  <md-icon md-menu-origin md-svg-icon="firstpagearrow"></md-icon>
-                </md-button>
+        <!-- Controls that handle which image is shown -->
+        <div class="playControls" layout="row">
 
-                <!-- Button to go back one image -->
-                <md-button ng-click="ctrl.backwardOption()" ng-disabled="playStatus" class="menuButton md-primary mapBack" aria-label="Left image control" style="margin-right: 0px; margin-left: 0px;">
-                  <md-icon md-menu-origin md-svg-icon="leftarrow"></md-icon>
-                </md-button>
+          <!-- Button to goto first image -->
+          <md-button ng-click="ctrl.startOption()" ng-disabled="playStatus" class="menuButton md-primary mapFirst" aria-label="First image control" style="margin-right: 0px; margin-left: auto;">
+            <md-icon md-menu-origin md-svg-icon="firstpagearrow"></md-icon>
+          </md-button>
 
-                <!-- Button to control play of images -->
-                <md-button ng-if="!playStatus" ng-click="ctrl.playOption()" class="menuButton md-primary mapPlay" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
-                  <md-icon md-menu-origin md-svg-icon="playarrow"></md-icon>
-                </md-button>
+          <!-- Button to go back one image -->
+          <md-button ng-click="ctrl.backwardOption()" ng-disabled="playStatus" class="menuButton md-primary mapBack" aria-label="Left image control" style="margin-right: 0px; margin-left: 0px;">
+            <md-icon md-menu-origin md-svg-icon="leftarrow"></md-icon>
+          </md-button>
 
-                <!-- Button to stop play of images -->
-                <md-button ng-if="playStatus" ng-click="ctrl.stopOption()" class="menuButton md-primary mapStop" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
-                  <md-icon md-menu-origin md-svg-icon="stop"></md-icon>
-                </md-button>
+          <!-- Button to control play of images -->
+          <md-button ng-if="!playStatus" ng-click="ctrl.playOption()" class="menuButton md-primary mapPlay" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
+            <md-icon md-menu-origin md-svg-icon="playarrow"></md-icon>
+          </md-button>
 
-                <!-- Button to go forward one image -->
-                <md-button ng-click="ctrl.forwardOption()" ng-disabled="playStatus" class="menuButton md-primary mapFwd" aria-label="Right image control" style="margin-right: 0px; margin-left: 0px;">
-                  <md-icon md-menu-origin md-svg-icon="rightarrow"></md-icon>
-                </md-button>
+          <!-- Button to stop play of images -->
+          <md-button ng-if="playStatus" ng-click="ctrl.stopOption()" class="menuButton md-primary mapStop" aria-label="Play control" style="margin-right: 0px; margin-left: 0px;">
+            <md-icon md-menu-origin md-svg-icon="stop"></md-icon>
+          </md-button>
 
-                <!-- Button to go to last image -->
-                <md-button ng-click="ctrl.endOption()" ng-disabled="playStatus" class="menuButton md-primary mapLast" aria-label="Last image control" style="margin-right: auto; margin-left: 0px;">
-                  <md-icon md-menu-origin md-svg-icon="lastpagearrow"></md-icon>
-                </md-button>
+          <!-- Button to go forward one image -->
+          <md-button ng-click="ctrl.forwardOption()" ng-disabled="playStatus" class="menuButton md-primary mapFwd" aria-label="Right image control" style="margin-right: 0px; margin-left: 0px;">
+            <md-icon md-menu-origin md-svg-icon="rightarrow"></md-icon>
+          </md-button>
 
-              </div>
+          <!-- Button to go to last image -->
+          <md-button ng-click="ctrl.endOption()" ng-disabled="playStatus" class="menuButton md-primary mapLast" aria-label="Last image control" style="margin-right: auto; margin-left: 0px;">
+            <md-icon md-menu-origin md-svg-icon="lastpagearrow"></md-icon>
+          </md-button>
 
-              <!-- Controls that handle options for the images -->
-              <div class="timeLine">
+        </div>
 
-                <div id="horizontal-container">
-                  <md-button class="md-fab md-mini md-primary timeLineButtons" ng-repeat="item in testcurrentImages" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item.id)" aria-label="Image Button {{ item.id }}" value="{{ item.id }}">
-                    {{ item.id }}
-                  </md-button>
-                </div>
+        <!-- Controls that handle options for the images -->
+        <div class="timeLine">
 
-              </div>
-
-            </md-toolbar>
-
-            <!-- Bottom Classification Bar -->
-            <md-toolbar layout="row"  layout-align="start center" class="md-primary md-hue-2 classification1 mapClass">
-              <div class="text1" style="margin-right: auto; margin-left: auto;"> {{ data.classificationText }} </div>
-            </md-toolbar> 
-
+          <div id="horizontal-container">
+            <md-button ng-class="selectedGetClass(item.id)" ng-right-click="rightClick(item.id)" class="md-fab md-mini md-primary timeLineButtons" ng-repeat="item in testcurrentImages" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item.id)" aria-label="Image Button {{ item.id }}" value="{{ item.id }}">
+              {{ item.id }}
+            </md-button>
           </div>
-          
-        </md-content>
 
-      </section>
+        </div>
+
+      </md-toolbar>
+
+      <!-- Bottom Classification Bar -->
+      <md-toolbar layout="row"  layout-align="start center" class="md-primary md-hue-2 classification1 ">
+        <div class="text1" style="margin-right: auto; margin-left: auto;"> {{ data.classificationText }} </div>
+      </md-toolbar> 
 
     </div>
 
