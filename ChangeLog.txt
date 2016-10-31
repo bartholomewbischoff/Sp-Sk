@@ -1,3 +1,16 @@
+11/4/2016
+-------------------------------------------------------
+
+
+10/28/2016
+-------------------------------------------------------
+	- added ability to copy lat and lon data to clipboard 
+	- added right click control to the openlayers map
+	- worked on page accessibility when viewed using smaller screen
+	- added ability to create an AOI and return extents, for use on algorithm tools
+	- added center option to the new right click menu on the openlayers map
+
+
 10/21/2016
 -------------------------------------------------------
 	- added playback speed selection option to the application settings sidenav
