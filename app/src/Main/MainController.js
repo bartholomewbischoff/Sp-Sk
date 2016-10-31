@@ -34,17 +34,21 @@ angular
       $mdSidenav(navID).toggle();
     };
 
+    // function to check if value is on the movie list
+    $scope.movieCheck = function(ind) {
+        if( ($.inArray((ind), $scope.remainingImages)) != -1 || ($.inArray((ind), $scope.remainingImages)) > -1 ) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     // function to alter movie id array on right click
     $scope.rightClick = function(ind) {
-        console.log("I was right clicked = " + ind);
-        console.log("Remaining = " + $scope.remainingImages);
-        console.log( ($.inArray((ind), $scope.remainingImages)) );
         if( ($.inArray((ind), $scope.remainingImages)) != -1 || ($.inArray((ind), $scope.remainingImages)) > -1 ) {
             $scope.remainingImages.splice( $.inArray(ind, $scope.remainingImages) , 1 );
-            console.log("Remaining = " + $scope.remainingImages);
         } else {
             $scope.remainingImages.push(ind);
-            console.log("Remaining = " + $scope.remainingImages);
         };
     };
 
@@ -105,6 +109,59 @@ angular
     var initializeMap = function(target = 'map') {  
         MapService.createMap(target);
         MapService.setVisibility();
+
+        // listener for moving pointer
+        /*MapService.map.addEventListener('pointermove', function(e) {
+            if (e.dragging) return;
+            
+            var pixel = this.getEventPixel(e.originalEvent);
+            var hit = this.hasFeatureAtPixel(pixel);
+        
+            map.style.cursor = hit ? 'pointer' : '';
+        });*/
+
+        // listener for capturing mouse point
+        MapService.map.on('click', function(event) {
+            //var coord = ol.proj.transform(event.coordinate, 'EPSG:0000', 'EPSG:4326');
+            var lon = event.coordinate[0];
+            var lat = event.coordinate[1];
+            console.log('The latitude is: ' + lon + ' and the longitude is ' + lat);
+            //alert('The latitude is: ' + lon + ' and the longitude is ' + lat);
+        });
+
+        // listener for right click menu
+        MapService.contextmenu.on('open', function(evt){
+            var feature = MapService.map.forEachFeatureAtPixel(evt.pixel, function(ft, l){
+                return ft;
+            });
+
+            if (feature && feature.get('type') == 'removable') {
+                MapService.contextmenu.clear();
+                MapService.removeMarkerItem.data = {
+                    marker: feature
+                };
+                MapService.contextmenu.push(MapService.removeMarkerItem);
+                
+            } else {
+                MapService.contextmenu.clear();
+                MapService.contextmenu.extend(MapService.contextmenu_items);
+            }
+        });
+
+        //Enable interaction by holding alt key
+        document.addEventListener('keydown', function(event) {
+            if (event.keyCode == 18) {
+                MapService.extentBox.setActive(true);
+            }
+        });
+        document.addEventListener('keyup', function(event) {
+            if (event.keyCode == 18) {
+                MapService.extentBox.setActive(false);
+                var extent = MapService.extentBox.getExtent();
+                console.log(extent);
+            }
+        });
+
         console.log("The map was initialized ...");
     };
 
@@ -242,24 +299,24 @@ angular
     this.mainHelpSettings = {
         steps:[
         {
-            element: '.algoMenuButton',
-            intro: 'Click here to access the available algorithms.',
-            position: 'right'
-        },
-        {
             element: '.filterMenuButton',
             intro: 'Click here to change the filter options.',
             position:'right'
         },
         {
-            element: '.settingsMenuButton',
-            intro: 'Click here to change the applications defualt settings.',
-            position: 'left'
+            element: '.algoMenuButton',
+            intro: 'Click here to access the available algorithms.',
+            position: 'right'
         },
         {
             element: '.satFootButton',
             intro: 'Click here to view the footprint of the current sensor.',
             position: 'right'
+        },
+        {
+            element: '.settingsMenuButton',
+            intro: 'Click here to change the applications defualt settings.',
+            position: 'left'
         },
         {
             element: '.movieMenuButton',
@@ -274,12 +331,12 @@ angular
         {
             element: '.playControls',
             intro: 'Control the map imagery by using these controls.',
-            position: 'bottom'
+            position: 'top'
         },
         {
             element: '#horizontal-container',
             intro: 'The tiles returned after setting the filter options are displayed here.  Click one to directly display that tile in the map region.  A red tile indicates that tile is missing and cannot be displayed.  A yellow tile indicates that tile is currently being viewed.',
-            position: 'bottom'
+            position: 'top'
         },
         {
             element: '.TrickingIntroJSwithThisClassName',
@@ -300,11 +357,6 @@ angular
             element: '.ol-rotate-reset',
             intro: 'If the image is oriented from 0°, a button will display here which allows the user to quickly reorient the image to the 0° view.',
             position: 'right'
-        },
-        {
-            element: '.ol-full-screen',
-            intro: 'Switch to the full screen mode if more viewing space is desired.  Switch back to the normal view using the ESC key or by clicking the maps X button.' ,
-            position: 'left'
         }],
         showStepNumbers: false, 
         showBullets: true,

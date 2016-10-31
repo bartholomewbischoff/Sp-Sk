@@ -107,12 +107,17 @@ md-toolbar.classification2 {
   min-height: 16px !important;
 }
 
-.controlsToolbar {
-  min-height: 45px !important;
-  height: 45px;
+.classification1 .text1, classification2 .text1 {
+  margin-right: auto; 
+  margin-left: auto;
 }
 
-.productControls {
+.controlsToolbar {
+  min-height: 45px !important;
+  /*height: 45px;*/
+}
+
+/*.productControls {
   width: 33.33%;
 } 
 
@@ -122,6 +127,10 @@ md-toolbar.classification2 {
 
 .timeLine {
   width: 33.33%;
+}*/
+
+.playControlButton {
+  margin: 0 -10px 0 10px;
 }
 
 .scroll-text {
@@ -148,7 +157,7 @@ md-sidenav  md-list {
 }
 
 .infonav {
-  width: 450px;
+  width: 390px;
 }
 
 

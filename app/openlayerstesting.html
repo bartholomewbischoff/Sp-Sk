@@ -1,44 +1,200 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Attributions</title>
-    <link rel="stylesheet" href="https://openlayers.org/en/v3.18.2/css/ol.css" type="text/css">
+    <title>Mouse Position</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v3.19.0/css/ol.css" type="text/css">
     <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
-    <script src="https://openlayers.org/en/v3.18.2/build/ol.js"></script>
+    <script src="https://openlayers.org/en/v3.19.0/build/ol.js"></script>
+    <link href="//cdn.jsdelivr.net/openlayers.contextmenu/latest/ol3-contextmenu.min.css" rel="stylesheet">
+    <script src="//cdn.jsdelivr.net/openlayers.contextmenu/latest/ol3-contextmenu.js"></script>
   </head>
   <body>
-    <div id="map" class="map"></div>
+  
+    <div id="map" tabindex="0"></div>
     <script>
+      (function(win, doc){
+        'use strict';
+        
+        var view = new ol.View({
+            center: [0, 0],
+            zoom: 2,
+            minZoom: 2,
+            maxZoom: 20
+          }),
 
-      var infoLabel = document.createElement('span');
-      infoLabel.textContent = 'i';
+          vectorLayer = new ol.layer.Vector({
+            source: new ol.source.Vector()
+          }),
 
-      var attribution = new ol.control.Attribution({
-        collapsible: true,
-        label: infoLabel
-      });
-
-      var map = new ol.Map({
-        layers: [
-          new ol.layer.Tile({
+          baseLayer = new ol.layer.Tile({
             source: new ol.source.OSM()
-          })
-        ],
-        controls: ol.control.defaults({attribution: false}).extend([attribution]),
-        target: 'map',
-        view: new ol.View({
-          center: [0, 0],
-          zoom: 2
-        }),
-        logo: {
-          src: './assets/images/nasic.png',
-          href: 'spectre@nasic.wrightpatterson.af.smil.mil'
-        }
-      });
+          }),
 
-      window.addEventListener('resize', checkSize);
-      checkSize();
+          mousePositionControl = new ol.control.MousePosition({
+              coordinateFormat: ol.coordinate.createStringXY(4),
+              projection: 'EPSG:4326',
+              undefinedHTML: '&nbsp;'
+          }),
+
+          map = new ol.Map({
+            target: doc.getElementById('map'),
+            view: view,
+            layers: [baseLayer, vectorLayer],
+            controls: ol.control.defaults().extend([
+                mousePositionControl
+            ]),
+          }),
+
+          // from https://github.com/DmitryBaranovskiy/raphael
+          elastic = function(t) {
+            return Math.pow(2, -10 * t) * Math.sin((t - 0.075) * (2 * Math.PI) / 0.3) + 1;
+          },
+
+          center = function(obj, foo){
+            var pan = ol.animation.pan({
+              duration: 1000,
+              easing: elastic,
+              source: view.getCenter()
+            });
+
+            map.beforeRender(pan);
+            view.setCenter(obj.coordinate);
+          },
+
+          copycoord = function(evt) {
+            var coord = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+            console.log(evt.coordinate);
+            var lon = coord[0];
+            var lat = coord[1];
+            alert('The latitude is: ' + lon + ' and the longitude is ' + lat);
+          },
+
+          url_clipboard = './assets/svg/clipboard_48px.svg',
+          url_marker = './assets/svg/location_on_48px.svg',
+          url_unmarker = './assets/svg/location_off_48px.svg',
+          url_center = './assets/svg/searching_48px.svg',
+
+          marker = function(obj){
+            var coord4326 = ol.proj.transform(
+                  obj.coordinate, 'EPSG:3857', 'EPSG:4326'),
+              template = 'Coordinate is ({x} | {y})',
+              iconStyle = new ol.style.Style({
+                image: new ol.style.Icon({
+                  scale: .6,
+                  src: url_marker
+                }),
+                text: new ol.style.Text({
+                  offsetY: 25,
+                  text: ol.coordinate.format(coord4326, template, 2),
+                  font: '15px Open Sans,sans-serif',
+                  fill: new ol.style.Fill({ color: '#111' }),
+                  stroke: new ol.style.Stroke({
+                    color: '#eee', width: 2
+                  })
+                })
+              }),
+              feature = new ol.Feature({
+                type: 'removable',
+                geometry: new ol.geom.Point(obj.coordinate)
+              });
+            
+            feature.setStyle(iconStyle);
+            vectorLayer.getSource().addFeature(feature);
+          };
+
+        var extent = new ol.interaction.Extent({
+          condition: ol.events.condition.platformModifierKeyOnly
+        });
+        map.addInteraction(extent);
+        extent.setActive(false);
+
+        //Enable interaction by holding shift
+        document.addEventListener('keydown', function(event) {
+          if (event.keyCode == 17) {
+            extent.setActive(true);
+            console.log("I was clicked ...");
+          }
+        });
+        document.addEventListener('keyup', function(event) {
+          if (event.keyCode == 17) {
+            extent.setActive(false);
+          }
+        });
+
+        map.on("click", function(evt) {
+          var coord = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+          console.log(evt.coordinate);
+          var lon = coord[0];
+          var lat = coord[1];
+          alert('The latitude is: ' + lon + ' and the longitude is ' + lat);
+        });
+        
+        var contextmenu_items = [
+          {
+            text: 'Center map here',
+            callback: center,
+            icon: url_center
+          },
+          '-', // this is a separator
+          {
+            text: 'Copy Coordinates',
+            callback: copycoord,
+            icon: url_clipboard
+          },
+          '-', // this is a separator
+          {
+            text: 'Add a Marker',
+            icon: url_marker,
+            callback: marker
+          }];
+
+        var contextmenu = new ContextMenu({
+          width: 190,
+          default_items: false,
+          items: contextmenu_items
+        });
+        map.addControl(contextmenu);
+        
+        var removeMarker = function(obj){
+          vectorLayer.getSource().removeFeature(obj.data.marker);
+        };
+
+        var removeMarkerItem = {
+          text: 'Remove this Marker',
+          icon: url_unmarker,
+          callback: removeMarker
+        };
+        
+        contextmenu.on('open', function(evt){
+          var feature = map.forEachFeatureAtPixel(evt.pixel, function(ft, l){
+            return ft;
+          });
+
+          if (feature && feature.get('type') == 'removable') {
+            contextmenu.clear();
+            removeMarkerItem.data = {
+              marker: feature
+            };
+            contextmenu.push(removeMarkerItem);
+            
+          } else {
+            contextmenu.clear();
+            contextmenu.extend(contextmenu_items);
+            //contextmenu.extend(contextmenu.getDefaultItems());
+          }
+        });
+
+        map.on('pointermove', function(e) {
+          if (e.dragging) return;
+              
+          var pixel = map.getEventPixel(e.originalEvent);
+          var hit = map.hasFeatureAtPixel(pixel);
+          
+          map.getTarget().style.cursor = hit ? 'pointer' : '';
+        });
+
+      })(window, document);
     </script>
   </body>
 </html>

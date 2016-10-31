@@ -5,6 +5,7 @@ angular
         $mdIconProvider
             .defaultIconSet("./assets/svg/avatars.svg" , 128)
             .icon("algo"       , "./assets/svg/algorithm_48px.svg" , 48)
+            .icon("clipboard"  , "./assets/svg/clipboard_48px.svg" , 48)
             .icon("close"      , "./assets/svg/close_48px.svg" , 48)
             .icon("earth"      , "./assets/svg/earth_48px.svg", 48)
             .icon("earth2"     , "./assets/svg/earth_2_48px.svg", 48)
@@ -19,6 +20,8 @@ angular
             .icon("leftarrow"  , "./assets/svg/left_arrow_48px.svg" , 48)
             .icon("listmenu"   , "./assets/svg/list_48px.svg" , 48)
             .icon("livehelp"   , "./assets/svg/live_help_48px.svg" , 48)
+            .icon("locationon" , "./assets/svg/location_on_48px.svg" , 48)
+            .icon("locationoff"  , "./assets/svg/location_off_48px.svg" , 48)
             .icon("menu"       , "./assets/svg/menu.svg" , 24)
             .icon("movie"      , "./assets/svg/movies_48px.svg" , 48)
             .icon("playarrow"  , "./assets/svg/play3.svg" , 48)
@@ -27,6 +30,7 @@ angular
             .icon("rightarrow" , "./assets/svg/right_arrow_48px.svg" , 48)
             .icon("rotate"     , "./assets/svg/rotate_90_18px.svg" , 48)
             .icon("satellite"  , "./assets/svg/satellite_48px.svg" , 48)
+            .icon("searching"  , "./assets/svg/searching_48px.svg" , 48)
             .icon("settings"   , "./assets/svg/settings_48px.svg" , 48)
             .icon("share"      , "./assets/svg/share.svg" , 24)
             .icon("stop"       , "./assets/svg/stop_48px.svg" , 48);
