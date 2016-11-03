@@ -1,6 +1,11 @@
 11/4/2016
 -------------------------------------------------------
-
+	- updated documentation
+	- added ability to view filter settings in the url params
+	- added ability to load filter server output
+	- added ability to remove layers when resetting the map
+	- added default no layers view
+	- resized toolbar widths to smaller size
 
 10/28/2016
 -------------------------------------------------------
