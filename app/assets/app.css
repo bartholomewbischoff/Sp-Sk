@@ -114,7 +114,7 @@ md-toolbar.classification2 {
 
 .controlsToolbar {
   min-height: 45px !important;
-  /*height: 45px;*/
+  height: 45px;
 }
 
 /*.productControls {
@@ -158,6 +158,28 @@ md-sidenav  md-list {
 
 .infonav {
   width: 390px;
+}
+
+.sidenav-title {
+    font-size: 20px;
+    letter-spacing: 0.005em;
+    box-sizing: border-box;
+    font-weight: 400;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    width: 100%;
+    height: inherit;
+    max-height: 64px;
+    padding: 0 16px;
+    margin: 0;
 }
 
 
@@ -205,6 +227,32 @@ md-button.menuBtn > md-icon {
   width: 100%;
   height: 100%;
 }
+
+.defaultMap {
+  overflow: hidden;
+  display: table;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+}
+
+.defaultMap div{
+  display:table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.defaultMap div .message{
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 1px 1px 0 #000; 
+  border-radius: 0.5em;
+  padding: 1.0em;
+  background: rgba(233, 241, 223, 0.25);
+}
+
 
 #content img {
   display: block;

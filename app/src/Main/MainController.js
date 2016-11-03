@@ -1,88 +1,181 @@
 angular
   .module('main', ['ngMaterial'])
-  .controller('MainController', function($interval, $scope, $mdDialog, $mdSidenav, $mdToast, DefaultConfigs, MapService) {
-    var originatorEv
-    var currentImages = [1, 2, 3, 4, 5];
-    $scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}, {id:6}, {id:7}, {id:8}, {id:9}, {id:10}, {id:11}, {id:12}, {id:13}, {id:14}, {id:15}, {id:16}, {id:17}, {id:18}, {id:19}, {id:20}, {id:21}, {id:22}];
-    //$scope.testcurrentImages = [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}];
-    $scope.lenCurrentImages = $scope.testcurrentImages.length;
-    var isDlgOpen;
-    $scope.remainingImages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
-
+  .controller('MainController', function($interval, $location, $scope, $mdDialog, $mdSidenav, $mdToast, DefaultConfigs, MapService) {
+    
+    var originatorEv;
+    // boolean for satellite footprint widget view status
+    var satViewOpen;
+    // boolean for status of layers
+    $scope.noLayers = true;
+    // stores the array of images that are to excluded from the movie maker
+    $scope.removedImages = [];
+    // stores the filter form values 
+    $scope.filterVals = {
+        'start': null,
+        'end': null
+    };
+    /*$scope.filterVals = {
+        'endDate': '',
+        'endTime': '',
+        'selectedSensor': '',
+        'selectedDelta': '',
+        'isLive': false
+    };*/
+    // stores the id of the currently viewed layer, initial value on page load is the url start param
+    $scope.currentId = $location.search().start;
+    // stores the id of the previously viewed layer
+    $scope.prevId = null;
+    // stores the user settings defined in the DefaultConfigs.js
     $scope.data = DefaultConfigs;
+    // stores the status of the play control
     $scope.playStatus = false;
+    // stores the introjs help settings to be used by the view
     $scope.helpSettings;
 
-    // delays initialization of the openlayers map until page is ready
+    // Delays initialization of the openlayers map until page is ready.
     window.onload = function() {
+        // store url params
+        $scope.filterVals.start  = parseInt($location.search().start, 10);
+        $scope.filterVals.end = parseInt($location.search().end, 10);
+
+        // set timeout so DOM is ready before map initialization is attempted
         setTimeout(
             function() {
-                initializeMap();
+                // if url params exist then build the map and controls
+                if ($scope.filterVals.start && $scope.filterVals.end) {
+                    initializeMap();
+                }
+                // after building map check if layers exist beyond the vector layer and set no layer boolean accordingly
+                if (MapService.layers.length > 1) {
+                    noLayers = false;
+                } else {
+                    noLayers = true;
+                }
+                // per design toggle filternav so user can set
                 toggling('filternav');
             }, 5);
 
+        // initialize the timeline container settings    
         $('#horizontal-container').slimscroll({
             alwaysVisible: true,
             height: '45px',
             width: '95%',
             axis: 'x'
         });
+        
     };
  
-    // sidenav toggle function available to the controller
+    // Sidenav toggle function available to the main controller.
     var toggling = function(navID) {
       $mdSidenav(navID).toggle();
     };
 
-    // function to check if value is on the movie list
+    // Function used to check if id is on the movie list.
+    // Used for display of X icon on timeline layer buttons. 
     $scope.movieCheck = function(ind) {
-        if( ($.inArray((ind), $scope.remainingImages)) != -1 || ($.inArray((ind), $scope.remainingImages)) > -1 ) {
-            return false;
-        } else {
+        // if ind is in array return boolean
+        if( ($.inArray((ind), $scope.removedImages)) != -1 || ($.inArray((ind), $scope.removedImages)) > -1 ) {
             return true;
+        } else {
+            return false;
         }
     }
 
-    // function to alter movie id array on right click
+    // Function used to alter excluded id array on right click of timeline layer button.
+    // Used by the ng-right-click directive on the timeline layer buttons.
     $scope.rightClick = function(ind) {
-        if( ($.inArray((ind), $scope.remainingImages)) != -1 || ($.inArray((ind), $scope.remainingImages)) > -1 ) {
-            $scope.remainingImages.splice( $.inArray(ind, $scope.remainingImages) , 1 );
+        // if ind is in array, remove ind from list, else add ind to list
+        if( ($.inArray((ind), $scope.removedImages)) != -1 || ($.inArray((ind), $scope.removedImages)) > -1 ) {
+            $scope.removedImages.splice( $.inArray(ind, $scope.removedImages) , 1 );
         } else {
-            $scope.remainingImages.push(ind);
+            $scope.removedImages.push(ind);
         };
     };
 
-    // function to change style on timeline button on click  
+    // Function to change style on timeline layer buttons based on whether layer is 
+    // on the excluded from movie list or being currently viewed.  
+    // Used by the ng-class directive on the timeline layer buttons.
     $scope.selectedGetClass = function(ind){
 
-        if( ($.inArray((ind), $scope.remainingImages)) == -1 ){
-            if( ind == (MapService.currentIter + 1) ) {
+        // if ind is in array
+        if( ($.inArray((ind), $scope.removedImages)) != -1 || ($.inArray((ind), $scope.removedImages)) > -1 ) {
+            if( ind == ($scope.currentId) ) {
                 return "selected"
             } 
             return "removed"
-        } else if( ind == (MapService.currentIter + 1) ) {
+        } else if( ind == ($scope.currentId) ) {
             return "selected"
         } else {
             return ""
         }
+
     }
 
-    // save the application settings
+    // Function to make array of layers available to the view.
+    // Used by the ng-repeat directive on the timeline button element to create a button for each image layer.
+    $scope.getImages = function() {
+        return MapService.currentImages
+    }
+
+    // Function to display image based on left click of layer button in timeline.
+    // Used by the ng-click directive on the timeline layer buttons.
+    this.gotoImage = function(id) {
+
+        // store the current id as the previous id
+        $scope.prevId = $scope.currentId;
+        // set current id to new id value
+        $scope.currentId = id;
+        // update the map with the current rotation, zoom, and center settings
+        MapService.updateCurrentRotation();
+        MapService.updateCurrentZoom();
+        MapService.updateCurrentCenter();
+        // toggle the visibility of the layers
+        $scope.setVisibility();
+
+    }
+
+    // Function to save the application settings changed in the settings sidenav.
+    // Used by the ng-click directive on the apply button on the settings sidenav.
     this.saveSettings = function() {
+
+        // if form is valid save settings
         if ($scope.settingsForm.$valid) {
+            // updates play speed
             $scope.data.updateInterval = $scope.settingsForm.speed.$modelValue * DefaultConfigs.updateInterval;
         }
-        console.log('Settings were saved ...');
+        // toggles settingsnav after apply button has been clicked
         this.toggle('settingsnav');
+
     }
 
-    // save the filter settings
+    // Function to save the filter settings changed in the filter sidenav.
+    // Used by the ng-click directive on the apply button on the filter sidenav.
     this.saveFilter = function() {
-        console.log('Filter settings were saved ...');
+
+        var settings = {};
+        // store form values
+        settings.start = $scope.filterVals.start;
+        settings.end = $scope.filterVals.end;
+        // if values exist store to url params and turn off noLayers boolean
+        if (settings.start && settings.end) {
+            noLayers = false;
+            $location.search('start', settings.start);
+            $location.search('end', settings.end);
+        }
+        // reset the map, this clears the map from the DOM and deletes previous layers
+        MapService.resetMap();
+        // sets currentId and prevId values
+        $scope.currentId = $location.search().start;
+        $scope.prevId = null;
+        // rebuild map
+        initializeMap();
+        // toggles filternav after apply button has been clicked
         this.toggle('filternav');
+
     }
     
-    // creates a toast to hold the satellite location info
+    // Function that creates a toast to hold the satellite footprint data.
+    // Used by the ng-click directive on the satellite view button, class "satFootButton".
     $scope.showSatelliteToast = function() {
         $mdToast.show({
           hideDelay   : 40000,
@@ -91,34 +184,29 @@ angular
           controller  : 'MainController',
           templateUrl : 'satelliteToast.html'
         });
-        isDlgOpen = true;
+        satViewOpen = true;
     };
 
-    // controls the opening and closing of the satellite toast
+    // Function that controls the opening and closing of the satellite toast.
+    // Used by the ng-click directive on the close satellite view button created 
+    // in satelliteToast.html, class "satFootCloseButton".
     $scope.closeSatelliteToast = function() {
-        if (isDlgOpen) return;
+        if (satViewOpen) {
+            return;
+        }
 
         $mdToast
           .hide()
           .then(function() {
-            isDlgOpen = false;
+            satViewOpen = false;
           });
     };
 
-    // initialize the openlayers map
-    var initializeMap = function(target = 'map') {  
+    // Function that builds the openlayers map and initiates the necessary listeners
+    // for the various controls.
+    var initializeMap = function(target = 'map') {
         MapService.createMap(target);
-        MapService.setVisibility();
-
-        // listener for moving pointer
-        /*MapService.map.addEventListener('pointermove', function(e) {
-            if (e.dragging) return;
-            
-            var pixel = this.getEventPixel(e.originalEvent);
-            var hit = this.hasFeatureAtPixel(pixel);
-        
-            map.style.cursor = hit ? 'pointer' : '';
-        });*/
+        $scope.setVisibility();
 
         // listener for capturing mouse point
         MapService.map.on('click', function(event) {
@@ -129,7 +217,7 @@ angular
             //alert('The latitude is: ' + lon + ' and the longitude is ' + lat);
         });
 
-        // listener for right click menu
+        // listener for right click menu on map
         MapService.contextmenu.on('open', function(evt){
             var feature = MapService.map.forEachFeatureAtPixel(evt.pixel, function(ft, l){
                 return ft;
@@ -148,7 +236,7 @@ angular
             }
         });
 
-        //Enable interaction by holding alt key
+        // enables interaction with the extent control by holding alt key
         document.addEventListener('keydown', function(event) {
             if (event.keyCode == 18) {
                 MapService.extentBox.setActive(true);
@@ -165,137 +253,191 @@ angular
         console.log("The map was initialized ...");
     };
 
-    // update the openlayers map
+    // Function that updates the openlayers map with current rotation, zoom, and center settings.
+    // Used mostly by the player controls.
     var updateMap = function() {
         MapService.updateCurrentRotation();
         MapService.updateCurrentZoom();
         MapService.updateCurrentCenter();
-        MapService.setVisibility();
+        $scope.setVisibility();
     }
 
-    // function to display image based on selection in timeline
-    this.gotoImage = function(id) {
-        MapService.prevIter = MapService.currentIter;
-        MapService.currentIter = id - 1;
-        MapService.updateCurrentRotation();
-        MapService.updateCurrentZoom();
-        MapService.updateCurrentCenter();
-        MapService.setVisibility(ind=(id-1));
-    }
+    // Function that sets the visibility of a map layer.
+    $scope.setVisibility = function(ind=$scope.currentId, prev=$scope.prevId) {
 
+        //var temp = MapService.map.getLayers().getArray();
+        var temp = MapService.layers;
+        if (temp[prev-1]) {
+            temp[prev-1].setVisible(false);
+        }
+        if (temp[ind-1]) {
+            temp[ind-1].setVisible(true);
+        }
+
+    };
+
+    // Function used to play through the map layers.
+    // Used by the playOption function.
     this.mapAnimation = function() {
-        var mapani = this;
+        var this_ = this;
+        // calls the forwardOption function at defined intervals defined by the users settings
         animationRunner = $interval(function() {
-            mapani.forwardOption();
+            this_.forwardOption();
         }, $scope.data.updateInterval);
     };
 
-    // function to move forward one image
+    // Function to move forward by an interval of one through the map layers.
+    // Used by the mapAnimation function and the ng-click directive on the forward button
+    // on the map player controls.
     this.forwardOption = function() {
-      console.log("The forward button was clicked ...");
-      if (MapService.currentIter < (currentImages.length - 1)) {
-          MapService.prevIter = MapService.currentIter;
-          MapService.currentIter = MapService.currentIter + 1;
-      }
-      else {
-          MapService.prevIter = MapService.currentIter;
-          MapService.currentIter = 0;
+    
+      // will iterate forward by one unless it is the last layer in the array
+      if ($scope.currentId < (MapService.currentImages[MapService.currentImages.length - 1])) {
+          // stores currentId as previousId
+          $scope.prevId = $scope.currentId;
+          // iterates forward
+          $scope.currentId = parseInt($scope.currentId, 10) + 1;
+      } else {
+          // stores currentId as previousId
+          $scope.prevId = $scope.currentId;
+          // iterates to first layer in array
+          $scope.currentId = MapService.currentImages[0];
       };
+      // updates map rotation, center, visibility, and zoom settings 
       updateMap();
+
     };
 
-    // function to move backward one image
+    // Function to move backward by an interval of one through the map layers.
+    // Used by the ng-click directive on the backward button on the map player controls.
     this.backwardOption = function() {
-      console.log("The backward button was clicked ...");
-      if (MapService.currentIter > 0)  {
-          MapService.prevIter = MapService.currentIter;
-          MapService.currentIter = MapService.currentIter - 1;
-      }
-      else {
-          MapService.prevIter = MapService.currentIter;
-          MapService.currentIter = currentImages.length - 1;
+
+      // will iterate backward by one unless it is the first layer in the array
+      if ($scope.currentId > 1)  {
+          // stores currentId as previousId
+          $scope.prevId = $scope.currentId;
+          // iterates backward in the array by one
+          $scope.currentId = parseInt($scope.currentId, 10) - 1;
+      } else {
+          // stores currentId as previousId
+          $scope.prevId = $scope.currentId;
+          // iterates to the last layer in the array
+          $scope.currentId = MapService.currentImages[MapService.currentImages.length - 1];
       };
+      // updates map rotation, center, visibility, and zoom settings 
       updateMap();
+
     };
 
-    // function to move to end image
+    // Function that will move the viewed layer to the last layer in the array.
+    // Used by the ng-click directive on the end button on the map player controls.
     this.endOption = function() {
-      console.log("The end button was clicked ...");
-      MapService.prevIter = MapService.currentIter;
-      MapService.currentIter = currentImages.length - 1;
+
+      // stores currentId as previousId
+      $scope.prevId = $scope.currentId;
+      // move to the end of the array
+      $scope.currentId = MapService.currentImages[MapService.currentImages.length - 1];
+      // updates map rotation, center, visibility, and zoom settings 
       updateMap();
+
     };
 
-    // function to move to start image
+    // Function that will move the viewed layer to the first layer in the array.
+    // Used by the ng-click directive on the start button on the map player controls.
     this.startOption = function() {
-      console.log("The start button was clicked ...");
-      MapService.prevIter = MapService.currentIter;
-      MapService.currentIter = 0;
+
+      // stores currentId as previousId
+      $scope.prevId = $scope.currentId;
+      // move to the beginning of the array
+      $scope.currentId = MapService.currentImages[0];
+      // updates map rotation, center, visibility, and zoom settings 
       updateMap();
+
     };
 
-    // function to play through images
+    // Function that animates through the layers on the map.
+    // Used by the ng-click directive on the play button on the map player controls.
     this.playOption = function() {
+
+      // set to true so that the play control will be hid, stop control
+      // will display, and the rest of the app options will be disabled
       $scope.playStatus = true;
       this.mapAnimation();
     };
 
-    // function to stop playing through images
+    // Function that will stop the animation of the map layers.
+    // Used by the ng-click directive on the stop button on the map player controls.
     this.stopOption = function() {
-      console.log("The stop button was clicked ...");
+
+      // set to false so stop control will be hid, play control will display, 
+      // and the rest of the app options will be enabled
       $scope.playStatus = false;
+      // ends animationRunner started in mapAnimation function
       if (angular.isDefined(animationRunner)) {
             $interval.cancel(animationRunner);
             animationRunner = undefined;
         }
+
     }
 
-    // function to toggle sidenav for search results, algorithms, filter options, and help menus
+    // Function used to toggle sidenavs.
     this.toggle = function(navID) {
       $mdSidenav(navID).toggle();
     };
 
-    // function to define the main help bubbles
+    // Function used to call the introjs help tutorial for the main app.
+    // Used by the ng-click directive on the tutorial button on the help sidenav.
     this.mainHelp = function() {
+
       this.toggle('helpnav');
       $scope.helpSettings = this.mainHelpSettings;
       setTimeout(
           function() {
             $scope.CallMe();
         }, 20);
+
     };
 
-    // function to open the algorithms menu
+    // Function used to call the introjs help tutorial for the algorith sidenav.
+    // Used by the ng-click directive on the help button on the algorithm sidenav toolbar.
     this.algoHelp = function() {
+
       $scope.helpSettings = this.algoHelpSettings;
       setTimeout(
           function() {
             $scope.CallMe();
         }, 20);
+
     };
 
-    // function to open the algorithms menu
+    // Function used to call the introjs help tutorial for the filter sidenav.
+    // Used by the ng-click directive on the help button on the filter sidenav toolbar.
     this.filterHelp = function() {
+
       $scope.helpSettings = this.filterHelpSettings;
       setTimeout(
           function() {
             $scope.CallMe();
         }, 20);
+
     };
 
-    // function to open the phenomenology menu
+    // Function used to toggle the help sidenav and open the phenomenology sidenav
+    // Used by the ng-click directive on the phenomenology button on the help sidenav.
     this.phenomHelp = function() {
       this.toggle('helpnav');
       this.toggle('phenomnav');
     };
 
-    // function to open the info panel
+    // Function used to toggle the help sidenav and open the info sidenav
+    // Used by the ng-click directive on the info button on the help sidenav.
     this.infoPanel = function() {
       this.toggle('helpnav');
       this.toggle('infonav');
     }
 
-    // Options for the help overlay
+    // Options for the main app introjs help tutorial.
+    // Used by mainHelp function.
     this.mainHelpSettings = {
         steps:[
         {
@@ -369,7 +511,8 @@ angular
         keyboardNavigation: true  
     };
 
-    //Algorithms help options
+    // Options for the algorithm menu introjs help tutorial.
+    // Used by algoHelp function.
     this.algoHelpSettings = {
         steps:[
         {
@@ -412,7 +555,8 @@ angular
           doneLabel: 'Exit' 
     };
 
-    // Filter help options
+    // Options for the filter menu introjs help tutorial.
+    // Used by filterHelp function.
     this.filterHelpSettings = {
       steps:[
         {
@@ -446,8 +590,10 @@ angular
         keyboardNavigation: true 
     };
 
-    // function to display HEMI algorithm options menu
+    // Function used to display the HEMI algorithm options dialog.
+    // Used by the ng-click directive on the hemi button on the algorithm sidenav
     this.hemiMenu = function() {
+
       $mdDialog.show(
         $mdDialog.alert()
           .targetEvent(originatorEv)
@@ -459,10 +605,13 @@ angular
       );
       this.toggle('algonav');
       originatorEv = null;
+
     };
 
-    // function to display Monsoon algorithm options menu
+    // Function used to display the Monsoon algorithm options dialog.
+    // Used by the ng-click directive on the monsoon button on the algorithm sidenav
     this.monsoonMenu = function() {
+
       $mdDialog.show(
         $mdDialog.alert()
           .targetEvent(originatorEv)
@@ -474,10 +623,13 @@ angular
       );
       this.toggle('algonav');
       originatorEv = null;
+
     };
 
-    // function to display Arapaho algorithm options menu
+    // Function used to display the arapaho algorithm options dialog.
+    // Used by the ng-click directive on the arapaho button on the algorithm sidenav
     this.arapahoMenu = function() {
+
       $mdDialog.show(
         $mdDialog.alert()
           .targetEvent(originatorEv)
@@ -489,10 +641,13 @@ angular
       );
       this.toggle('algonav');
       originatorEv = null;
+
     };
 
-    // function to display Stereo Cloud algorithm options menu
+    // Function used to display the Stereo algorithm options dialog.
+    // Used by the ng-click directive on the stereo button on the algorithm sidenav
     this.stereoMenu = function() {
+
       $mdDialog.show(
         $mdDialog.alert()
           .targetEvent(originatorEv)
@@ -504,10 +659,13 @@ angular
       );
       this.toggle('algonav');
       originatorEv = null;
+
     };
 
-    // function to display GIFT algorithm options menu
+    // Function used to display the GIFT algorithm options dialog.
+    // Used by the ng-click directive on the gift button on the algorithm sidenav
     this.giftMenu = function() {
+
       $mdDialog.show(
         $mdDialog.alert()
           .targetEvent(originatorEv)
@@ -519,10 +677,13 @@ angular
       );
       this.toggle('algonav');
       originatorEv = null;
+
     };
 
-    // function to display GOSS/SuperGOSS algorithm options menu
+    // Function used to display the GOSS algorithm options dialog.
+    // Used by the ng-click directive on the goss button on the algorithm sidenav
     this.gossMenu = function() {
+
       $mdDialog.show(
         $mdDialog.alert()
           .targetEvent(originatorEv)
@@ -534,10 +695,13 @@ angular
       );
       this.toggle('algonav');
       originatorEv = null;
+
     };
 
   })
+  // Directive for the right click feature on the timeline layer buttons.
   .directive('ngRightClick', function($parse) {
+    
     return function(scope, element, attrs) {
         var fn = $parse(attrs.ngRightClick);
         element.bind('contextmenu', function(event) {
@@ -547,4 +711,4 @@ angular
             });
         });
     };
-});
+  });

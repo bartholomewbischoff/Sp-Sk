@@ -1,14 +1,12 @@
 angular
     .module('main')
-    .service('MapService', function(DefaultConfigs) {
+    .service('MapService', function($location, DefaultConfigs) {
 
         this.map = null;
         this.layers = [];
         this.proj = null;
         this.baseURL = 'http://127.0.0.1:8888/';
-        this.currentImages = [1, 2, 3, 4, 5];
-        this.currentIter = 0;
-        this.prevIter = null;
+        this.currentImages = [];
         this.zoomLevel = DefaultConfigs.optionDefaults.zoom;
         this.currentZoomLevel = this.zoomLevel;
         this.centerValue = [DefaultConfigs.optionDefaults.x, DefaultConfigs.optionDefaults.y];
@@ -36,12 +34,12 @@ angular
         };
 
         // creates a map layer
-        this.createLayer = function(ind=this.currentIter, isVisible=false) {
-
+        this.createLayer = function(ind, isVisible=false) {
+            console.log('The createLayer ind is: ' + ind);
             imageLayer = new ol.layer.Tile({
                 preload: Infinity,
                 source: new ol.source.XYZ({
-                    url: this.baseURL + this.currentImages[ind] + '/{z}-{y}-{x}.png',
+                    url: this.baseURL + ind + '/{z}-{y}-{x}.png',
                     projection: this.proj,
                     wrapX: false,
                     attributions: [this.tileAttribution]
@@ -49,13 +47,19 @@ angular
                 transitionEffect: 'resize',
                 visible: isVisible
             });
+            imageLayer.playerId = parseInt(ind, 10);
             return imageLayer;
         };
 
         // updates the map layers
         this.buildLayers = function() {
+            var urlSettings = $location.search();
             var temp = null;
-            for (i = 0; i < this.currentImages.length; i++) {
+            this.currentImages = [];
+            
+            for (i = parseInt(urlSettings.start, 10); i < (parseInt(urlSettings.end, 10)+1); i++) {
+                console.log('i is: ' + i);
+                this.currentImages.push(i);
                 temp = this.createLayer(ind=i, isVisible=false);
                 this.layers.push(temp);
             }
@@ -66,16 +70,6 @@ angular
 
             this.layers.push(vectorLayer);
 
-        };
-
-        // set visibility of a layer
-        this.setVisibility = function(ind=this.currentIter, prev=this.prevIter) {
-            
-            var temp = this.map.getLayers().getArray();
-            if (prev) {
-                temp[prev].setVisible(false);
-            }
-            temp[ind].setVisible(true);
         };
 
         // 90° rotation controls
@@ -109,109 +103,110 @@ angular
         this.createMap = function(target) {
             this.createProjection();
             this.buildLayers();
-            
-            // create control for adding mouse coordinates to the map
-            var mousePositionControl = new ol.control.MousePosition({
-                coordinateFormat: ol.coordinate.createStringXY(4),
-                projection: DefaultConfigs.getProjection(),
-                undefinedHTML: '&nbsp;'
-            });
 
-            // create interaction for adding dragBox to the map
-            var dragBox = new ol.interaction.DragBox({
-                condition: ol.events.condition.platformModifierKeyOnly
-            });
-            // listener for dragBox to acquire the dimensions
-            dragBox.on('boxend', function() {
-                var extent = dragBox.getGeometry().getExtent();
-                console.log(extent);
-            });
-            // listener incase action is needed at end of box creation
-            dragBox.on('boxstart', function() {
-            });
-
-            // create interaction for adding extent to the map
-            this.extentBox = new ol.interaction.Extent({
-                condition: ol.events.condition.altKeyOnly
-            });
-            this.extentBox.setActive(false);
-
-            // create the map 
-            this.map = new ol.Map({
-                layers: this.layers,
-                target: target,
-                renderer: 'canvas',
-                controls: ol.control.defaults().extend([
-                    //new ol.control.FullScreen(),
-                    //this.contextmenu,
-                    new this.RotateCW90(),
-                    mousePositionControl
-                ]),
-                interactions: ol.interaction.defaults().extend([
-                    dragBox,
-                    this.extentBox
-                ]),
-                view: new ol.View({
-                    center: this.currentCenterValue,
-                    zoom: this.currentZoomLevel,
-                    maxZoom: 5,
+            if (this.currentImages.length != 0) {
+                // create control for adding mouse coordinates to the map
+                var mousePositionControl = new ol.control.MousePosition({
+                    coordinateFormat: ol.coordinate.createStringXY(4),
                     projection: DefaultConfigs.getProjection(),
-                    rotation: this.currentRotationValue
-                })
-            });
-
-            var url_clipboard = './assets/svg/clipboard_48px.svg';
-            var url_marker = './assets/svg/location_on_48px.svg';
-            var url_unmarker = './assets/svg/location_off_48px.svg';
-            var url_center = './assets/svg/searching_48px.svg';
-
-            // from https://github.com/DmitryBaranovskiy/raphael
-            var elastic = function(t) {
-                return Math.pow(2, -10 * t) * Math.sin((t - 0.075) * (2 * Math.PI) / 0.3) + 1;
-            };
-
-            var center = function(obj, foo = this.map){
-                var pan = ol.animation.pan({
-                    duration: 1000,
-                    easing: elastic,
-                    source: foo.getView().getCenter()
+                    undefinedHTML: '&nbsp;'
                 });
 
-                foo.beforeRender(pan);
-                foo.getView().setCenter(obj.coordinate);
-            };
+                // create interaction for adding dragBox to the map
+                var dragBox = new ol.interaction.DragBox({
+                    condition: ol.events.condition.platformModifierKeyOnly
+                });
+                // listener for dragBox to acquire the dimensions
+                dragBox.on('boxend', function() {
+                    var extent = dragBox.getGeometry().getExtent();
+                    console.log(extent);
+                });
+                // listener incase action is needed at end of box creation
+                dragBox.on('boxstart', function() {
+                });
 
-            var copycoord = function(event) {
-                //var coord = ol.proj.transform(event.coordinate, 'EPSG:0000', 'EPSG:4326');
-                var lon = event.coordinate[0];
-                var lat = event.coordinate[1];
-                console.log('The latitude is: ' + lon + ' and the longitude is ' + lat);
-                copyToClipboard(lat + ', ' + lon);
-                //alert('The latitude is: ' + lon + ' and the longitude is ' + lat);
-            };
+                // create interaction for adding extent to the map
+                this.extentBox = new ol.interaction.Extent({
+                    condition: ol.events.condition.altKeyOnly
+                });
+                this.extentBox.setActive(false);
 
-            this.contextmenu_items = [
-                {
-                    text: 'Center map here',
-                    callback: center,
-                    icon: url_center
-                },
-                '-', // this is a separator
-                {
-                    text: 'Copy Coordinates',
-                    callback: copycoord,
-                    icon: url_clipboard
-                }
-            ];
+                // create the map 
+                this.map = new ol.Map({
+                    layers: this.layers,
+                    target: target,
+                    renderer: 'canvas',
+                    controls: ol.control.defaults().extend([
+                        //new ol.control.FullScreen(),
+                        //this.contextmenu,
+                        new this.RotateCW90(),
+                        mousePositionControl
+                    ]),
+                    interactions: ol.interaction.defaults().extend([
+                        dragBox,
+                        this.extentBox
+                    ]),
+                    view: new ol.View({
+                        center: this.currentCenterValue,
+                        zoom: this.currentZoomLevel,
+                        maxZoom: 5,
+                        projection: DefaultConfigs.getProjection(),
+                        rotation: this.currentRotationValue
+                    })
+                });
 
-            this.contextmenu = new ContextMenu({
-                width: 190,
-                default_items: false,
-                items: this.contextmenu_items
-            });
+                var url_clipboard = './assets/svg/clipboard_48px.svg';
+                var url_marker = './assets/svg/location_on_48px.svg';
+                var url_unmarker = './assets/svg/location_off_48px.svg';
+                var url_center = './assets/svg/searching_48px.svg';
 
-            this.map.addControl(this.contextmenu);
+                // from https://github.com/DmitryBaranovskiy/raphael
+                var elastic = function(t) {
+                    return Math.pow(2, -10 * t) * Math.sin((t - 0.075) * (2 * Math.PI) / 0.3) + 1;
+                };
 
+                var center = function(obj, foo = this.map){
+                    var pan = ol.animation.pan({
+                        duration: 1000,
+                        easing: elastic,
+                        source: foo.getView().getCenter()
+                    });
+
+                    foo.beforeRender(pan);
+                    foo.getView().setCenter(obj.coordinate);
+                };
+
+                var copycoord = function(event) {
+                    //var coord = ol.proj.transform(event.coordinate, 'EPSG:0000', 'EPSG:4326');
+                    var lon = event.coordinate[0];
+                    var lat = event.coordinate[1];
+                    console.log('The latitude is: ' + lon + ' and the longitude is ' + lat);
+                    copyToClipboard(lat + ', ' + lon);
+                    //alert('The latitude is: ' + lon + ' and the longitude is ' + lat);
+                };
+
+                this.contextmenu_items = [
+                    {
+                        text: 'Center map here',
+                        callback: center,
+                        icon: url_center
+                    },
+                    //'-', this is a separator
+                    {
+                        text: 'Copy Coordinates',
+                        callback: copycoord,
+                        icon: url_clipboard
+                    }
+                ];
+
+                this.contextmenu = new ContextMenu({
+                    width: 190,
+                    default_items: false,
+                    items: this.contextmenu_items
+                });
+
+                this.map.addControl(this.contextmenu);
+            }
         };
 
         // removes a map
@@ -221,6 +216,8 @@ angular
                 $('.ol-viewport').remove();
             }
             this.map = null;
+            this.layers = [];
+            console.log('The map was reset');
         };
 
         // retain current zoom level

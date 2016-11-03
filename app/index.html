@@ -7,15 +7,17 @@
 
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html"; charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="" />
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
 
-    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
-    <link rel="stylesheet" href="../node_modules/angular-material/angular-material.css"/>
-    <link rel="stylesheet" href="assets/app.css"/>
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic' />
+
+    <link rel="stylesheet" href="../node_modules/angular-material/angular-material.css" />
     <link rel="stylesheet" href="../node_modules/openlayers/css/ol.css" />
     <link rel="stylesheet" href="../node_modules/angular-intro.js/introjs.css" />
+    <link rel="stylesheet" href="assets/app.css" />
+    <link rel="stylesheet" href="assets/ol3-contextmenu.css" />
 
     <style type="text/css">
         /**
@@ -27,7 +29,6 @@
     </style>
 
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="./src/jquery.slimscroll.js"></script>
 
     <script src="../node_modules/angular/angular.js"></script>
     <script src="../node_modules/angular-animate/angular-animate.js"></script>
@@ -37,19 +38,19 @@
     <script src="../node_modules/angular-intro.js/intro.js"></script>
     <script src="../node_modules/angular-intro.js/angular-intro.js"></script>
 
-    <script src="./src/Main/MainController.js"></script>
-    <script src="./src/Main/DefaultConfigs.js"></script>
-    <script src="./src/Main/MapService.js"></script>
-    <script src="./src/index.js"></script>
-
     <script src="//d3js.org/d3.v3.min.js"></script>
     <script src="//d3js.org/topojson.v1.min.js"></script>
 
     <script src="http://openlayers.org/en/v3.19.1/build/ol.js"></script>
 
-    <link href="//cdn.jsdelivr.net/openlayers.contextmenu/latest/ol3-contextmenu.min.css" rel="stylesheet">
-    <script src="//cdn.jsdelivr.net/openlayers.contextmenu/latest/ol3-contextmenu.js"></script>
+    <script src="./src/index.js"></script>
+    <script src="./src/jquery.slimscroll.js"></script>
+    <script src="./src/ol3-contextmenu.js"></script>
 
+    <script src="./src/Main/MainController.js"></script>
+    <script src="./src/Main/DefaultConfigs.js"></script>
+    <script src="./src/Main/MapService.js"></script>
+    
   </head>
 
   <body ng-cloak layout="column" ng-controller="MainController as ctrl" >
@@ -63,7 +64,7 @@
       </md-toolbar>
 
       <!-- Container #2 - Top toolbar in Container #1 -->
-      <md-toolbar layout="row" layout-xs="column" layout-align="space-between center" class="md-primary md-hue-2">
+      <md-toolbar layout="row" layout-xs="column" layout-align="space-between center" class="controlsToolbar md-primary md-hue-2">
 
         <div layout="row" layout-align="start center">
           <!-- Trigger element for Filter menu -->
@@ -105,8 +106,8 @@
         <!-- SideNav for Help Options -->
         <md-sidenav md-component-id="helpnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
 
-          <md-toolbar layout="row">
-            <h1 class="md-toolbar-tools">Help Options</h1>
+          <md-toolbar layout="row" class="controlsToolbar">
+            <h1 class="sidenav-title">Help Options</h1>
           </md-toolbar>
         
           <md-content layout-padding>
@@ -141,8 +142,8 @@
         <!-- SideNav for Settings Options -->
         <md-sidenav md-component-id="settingsnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
 
-          <md-toolbar layout="row">
-            <h1 class="md-toolbar-tools">Application Settings</h1>
+          <md-toolbar layout="row" class="controlsToolbar">
+            <h1 class="sidenav-title">Application Settings</h1>
           </md-toolbar>
         
           <md-content layout-padding>
@@ -171,17 +172,17 @@
         </md-sidenav>
 
         <!-- SideNav for Filter Options -->
-        <md-sidenav layout="column" layout-fill md-component-id="filternav" md-is-locked-open="sideNavOpen" class="filternav md-sidenav-left md-whiteframe-z2" md-disable-backdrop="true">
+        <md-sidenav md-component-id="filternav" layout="column" layout-fill md-is-locked-open="sideNavOpen" class="filternav md-sidenav-left md-whiteframe-z2" md-disable-backdrop="true">
           
-          <md-toolbar layout="row">
-            <h1 class="md-toolbar-tools">Filter Options</h1>
+          <md-toolbar layout="row" class="controlsToolbar">
+            <h1 class="sidenav-title">Filter Options</h1>
             <md-button class="menuButton" ng-click="ctrl.filterHelp()" aria-label="Show filter List" style="margin-right: 0px; margin-left: auto;">
               <md-icon md-svg-icon="help" ></md-icon>
             </md-button>
           </md-toolbar>
 
           <md-content flex layout="column" layout-padding layout-fill>
-            <form layout="column" layout-fill name="filterForm" ng-submit="submit()">
+            <form style="display: none;" layout="column" layout-fill name="filterForm" ng-submit="submit()">
                 
                 <!-- Sensor Option -->
                 <div class="sensorControls" layout="column">
@@ -233,6 +234,25 @@
                 <md-button class="md-raised submitControl" ng-click="ctrl.saveFilter()" type="button">Apply</md-button>
 
             </form>
+
+            <form layout="column" layout-fill name="filterForm" ng-submit="submit()">
+                
+                <!-- Time Back Option -->
+                <div class="timeBackControls" layout="column">
+                    <h2>Images</h2>
+                    <md-input-container flex="80" style="margin-left:10px; width:300px;">
+                      <label>Starting Image</label>
+                      <input required type="number" step="any" name="start"  min="1" max="4" ng-model="filterVals.start" />
+                    </md-input-container>
+                    <md-input-container flex="80" style="margin-left:10px; width:300px;">
+                      <label>Ending Image</label>
+                      <input required type="number" step="any" name="end"  min="2" max="5" ng-model="filterVals.end" />
+                    </md-input-container>
+                </div>
+
+                <md-button class="md-raised submitControl" ng-click="ctrl.saveFilter()" type="button">Apply</md-button>
+
+            </form>
           </md-content>
           
         </md-sidenav>
@@ -241,8 +261,8 @@
         <md-sidenav md-component-id="algonav" class="md-sidenav-left md-whiteframe-z2 md-closed" >
           
           <!-- Container #5 - top row of Container #3 -->
-          <md-toolbar layout="row">
-            <h1 class="md-toolbar-tools">Algorithms</h1>
+          <md-toolbar layout="row" class="controlsToolbar">
+            <h1 class="sidenav-title">Algorithms</h1>
             <md-button class="algoButton menuButton" ng-click="ctrl.algoHelp()" aria-label="Show Algorithm List" style="margin-right: 0px; margin-left: auto;">
               <md-icon md-svg-icon="help" ></md-icon>
             </md-button>
@@ -299,8 +319,8 @@
         <!-- SideNav for Phenomenology List -->
         <md-sidenav md-component-id="phenomnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
           
-          <md-toolbar layout="row">
-            <h1 class="md-toolbar-tools">About</h1>
+          <md-toolbar layout="row" class="controlsToolbar">
+            <h1 class="sidenav-title">About</h1>
             <md-button class="menuButton" ng-click="ctrl.toggle('phenomnav')" aria-label="Show Phenomenology Examples List" style="margin-right: 0px; margin-left: auto;">
               <md-icon md-svg-icon="help" ></md-icon>
             </md-button>
@@ -343,8 +363,8 @@
         <!-- SideNav for Info List -->
         <md-sidenav md-component-id="infonav" class="infonav md-sidenav-right md-whiteframe-z2 md-closed">
           
-          <md-toolbar layout="row">
-            <h1 class="md-toolbar-tools">About</h1>
+          <md-toolbar layout="row" class="controlsToolbar">
+            <h1 class="sidenav-title">About</h1>
           </md-toolbar>
 
           <md-content>
@@ -376,8 +396,16 @@
         
         <!-- Container #4 - map holder in Container #3 -->
         <div class="map" id="map">
-
+          <div ng-show="noLayers" class="defaultMap">
+            <div>
+              <div class="message">
+                <span> No data found. </span>
+                <span> Alter Filter Settings to load data. </span>
+              </div>
+            </div>
+          </div>
         </div>
+
 
       </md-content>
 
@@ -385,7 +413,7 @@
       <md-toolbar layout="row" layout-md="row" layout-sm="column" layout-xs="column" layout-align="space-between center" class="controlsToolbar md-primary md-hue-2">
         
         <!-- Controls that create a product -->
-        <div hide-sm hide-xs flex="33" flex-md="25" class="productControls" layout="row" layout-align="start center">
+        <div class="productControls" hide-sm hide-xs flex="33" flex-md="25" layout="row" layout-align="start center">
 
           <!-- Button to create movie -->
           <md-button ng-click="" class="menuButton movieMenuButton" aria-label="Create movie">
@@ -400,7 +428,7 @@
         </div>
 
         <!-- Controls that handle which image is shown -->
-        <div flex="33" flex-md="75" flex-sm="75" flex-xs="100" class="playControls" layout="row" layout-align="center center">
+        <div class="playControls" flex="33" flex-md="75" flex-sm="75" flex-xs="100" layout="row" layout-align="center center">
 
           <!-- Button to goto first image -->
           <md-button ng-click="ctrl.startOption()" ng-disabled="playStatus" class="menuButton md-primary playControlButton" aria-label="First image control" >
@@ -435,11 +463,12 @@
         </div>
 
         <!-- Controls that handle options for the images -->
-        <div hide-md hide-sm hide-xs flex="33" class="timeLine" layout="row" layout-align="center center">
+        <div class="timeLine" hide-md hide-sm hide-xs flex="33" layout="row" layout-align="center center">
 
-          <div id="horizontal-container">
-            <md-button ng-class="selectedGetClass(item.id)" ng-right-click="rightClick(item.id)" class="md-fab md-mini md-primary timeLineButtons" ng-repeat="item in testcurrentImages" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item.id)" aria-label="Image Button {{ item.id }}" value="{{ item.id }}">
-              <md-icon class="material-icons" ng-if="movieCheck(item.id)" md-svg-icon="close" style="padding-right: 10px;"></md-icon>
+          <div id="horizontal-container" >
+            <md-button ng-class="selectedGetClass(item)" ng-right-click="rightClick(item)" class="md-fab md-mini md-primary timeLineButtons" ng-repeat="item in getImages()" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item)" aria-label="Image Button {{item}}" value="{{item}}">
+              <!-- <md-icon class="material-icons" ng-if="movieCheck(item)" md-svg-icon="close" style="padding-right: 10px;"></md-icon> -->
+              {{ item }}
             </md-button>
           </div>
 
