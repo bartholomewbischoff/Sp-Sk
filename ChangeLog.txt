@@ -6,6 +6,11 @@
 	- added ability to remove layers when resetting the map
 	- added default no layers view
 	- resized toolbar widths to smaller size
+	- fixed sidenavs so they do not overlay since filter sidenav does not have backdrop overlay and is open on initial load
+	- set up methodolgy for storing layer ids for easy and accurate accessibility
+	- fixed player controls so that vector layer is not accidentally counted as a layer and iterated overlaid
+	- added close button for phenomenolgy and settings sidenavs
+	- fixed css for help and close buttons on sidenav toolbars
 
 10/28/2016
 -------------------------------------------------------
