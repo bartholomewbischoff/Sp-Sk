@@ -3,10 +3,15 @@ angular
   .controller('MainController', function($interval, $location, $scope, $mdDialog, $mdSidenav, $mdToast, DefaultConfigs, MapService) {
     
     var originatorEv;
+    // variable for animation interval
+    var animationRunner;
     // boolean for satellite footprint widget view status
     var satViewOpen;
     // boolean for status of layers
     $scope.noLayers = true;
+    // booleans for view status of sidenavs
+    //$scope.obj = false;
+    $scope.obj = { "filternav": false, "algonav": false, "settingsnav": false, "helpnav": false, "phenomnav": false, "infonav": false };
     // stores the array of images that are to excluded from the movie maker
     $scope.removedImages = [];
     // stores the filter form values 
@@ -22,7 +27,7 @@ angular
         'isLive': false
     };*/
     // stores the id of the currently viewed layer, initial value on page load is the url start param
-    $scope.currentId = $location.search().start;
+    $scope.currentId = 0;
     // stores the id of the previously viewed layer
     $scope.prevId = null;
     // stores the user settings defined in the DefaultConfigs.js
@@ -66,8 +71,15 @@ angular
     };
  
     // Sidenav toggle function available to the main controller.
-    var toggling = function(navID) {
-      $mdSidenav(navID).toggle();
+    var toggling = function(navId) {
+      $.each($scope.obj, function(key, value) { 
+          if ( value == true && navId != key ) {
+              $mdSidenav(key).toggle();
+              $scope.obj[key] = false 
+          }
+        });
+      $mdSidenav(navId).toggle();
+      $scope.obj[navId] = !$scope.obj[navId];
     };
 
     // Function used to check if id is on the movie list.
@@ -95,10 +107,10 @@ angular
     // Function to change style on timeline layer buttons based on whether layer is 
     // on the excluded from movie list or being currently viewed.  
     // Used by the ng-class directive on the timeline layer buttons.
-    $scope.selectedGetClass = function(ind){
+    $scope.selectedGetClass = function(ind, playerId){
 
         // if ind is in array
-        if( ($.inArray((ind), $scope.removedImages)) != -1 || ($.inArray((ind), $scope.removedImages)) > -1 ) {
+        if( ($.inArray((playerId), $scope.removedImages)) != -1 || ($.inArray((playerId), $scope.removedImages)) > -1 ) {
             if( ind == ($scope.currentId) ) {
                 return "selected"
             } 
@@ -111,10 +123,28 @@ angular
 
     }
 
+    // Function to check if a layer with a particular id exists
+    var layerExists = function(id) {
+
+        if (id !== null) {
+            var result = [];
+            MapService.layers.forEach( function(o) {
+                if (o.id == (id)) {
+                    result.push(o);
+                }
+            });
+            if (result.length > 0) {
+                return true;
+            }
+        }
+        return false;
+        
+    }
+
     // Function to make array of layers available to the view.
     // Used by the ng-repeat directive on the timeline button element to create a button for each image layer.
     $scope.getImages = function() {
-        return MapService.currentImages
+        return MapService.currentLayers
     }
 
     // Function to display image based on left click of layer button in timeline.
@@ -152,7 +182,10 @@ angular
     // Used by the ng-click directive on the apply button on the filter sidenav.
     this.saveFilter = function() {
 
+        
         var settings = {};
+        // will stop animation if one is playing
+        this.stopOption();
         // store form values
         settings.start = $scope.filterVals.start;
         settings.end = $scope.filterVals.end;
@@ -165,7 +198,7 @@ angular
         // reset the map, this clears the map from the DOM and deletes previous layers
         MapService.resetMap();
         // sets currentId and prevId values
-        $scope.currentId = $location.search().start;
+        $scope.currentId = 0;
         $scope.prevId = null;
         // rebuild map
         initializeMap();
@@ -265,25 +298,17 @@ angular
     // Function that sets the visibility of a map layer.
     $scope.setVisibility = function(ind=$scope.currentId, prev=$scope.prevId) {
 
-        //var temp = MapService.map.getLayers().getArray();
+        // get layers
         var temp = MapService.layers;
-        if (temp[prev-1]) {
-            temp[prev-1].setVisible(false);
+        // turn off previously viewed layer
+        if (layerExists(prev)) {
+            temp[prev].setVisible(false);
         }
-        if (temp[ind-1]) {
-            temp[ind-1].setVisible(true);
+        // turn on new layer
+        if (layerExists(ind)) {
+            temp[ind].setVisible(true);
         }
-
-    };
-
-    // Function used to play through the map layers.
-    // Used by the playOption function.
-    this.mapAnimation = function() {
-        var this_ = this;
-        // calls the forwardOption function at defined intervals defined by the users settings
-        animationRunner = $interval(function() {
-            this_.forwardOption();
-        }, $scope.data.updateInterval);
+        
     };
 
     // Function to move forward by an interval of one through the map layers.
@@ -292,17 +317,20 @@ angular
     this.forwardOption = function() {
     
       // will iterate forward by one unless it is the last layer in the array
-      if ($scope.currentId < (MapService.currentImages[MapService.currentImages.length - 1])) {
+      // if in play mode, will start over once end of layer array is reached
+      if ( $scope.currentId < (MapService.layers.length - 2) ) {
           // stores currentId as previousId
           $scope.prevId = $scope.currentId;
           // iterates forward
           $scope.currentId = parseInt($scope.currentId, 10) + 1;
-      } else {
+      } else if($scope.playStatus) {
           // stores currentId as previousId
           $scope.prevId = $scope.currentId;
-          // iterates to first layer in array
-          $scope.currentId = MapService.currentImages[0];
-      };
+          // iterates back to beginning
+          $scope.currentId = 0;
+      } else {
+          return
+      }
       // updates map rotation, center, visibility, and zoom settings 
       updateMap();
 
@@ -313,17 +341,14 @@ angular
     this.backwardOption = function() {
 
       // will iterate backward by one unless it is the first layer in the array
-      if ($scope.currentId > 1)  {
+      if ( $scope.currentId >= 1 ) {
           // stores currentId as previousId
           $scope.prevId = $scope.currentId;
-          // iterates backward in the array by one
+          // iterates backward
           $scope.currentId = parseInt($scope.currentId, 10) - 1;
       } else {
-          // stores currentId as previousId
-          $scope.prevId = $scope.currentId;
-          // iterates to the last layer in the array
-          $scope.currentId = MapService.currentImages[MapService.currentImages.length - 1];
-      };
+          return
+      }
       // updates map rotation, center, visibility, and zoom settings 
       updateMap();
 
@@ -333,12 +358,15 @@ angular
     // Used by the ng-click directive on the end button on the map player controls.
     this.endOption = function() {
 
-      // stores currentId as previousId
-      $scope.prevId = $scope.currentId;
-      // move to the end of the array
-      $scope.currentId = MapService.currentImages[MapService.currentImages.length - 1];
-      // updates map rotation, center, visibility, and zoom settings 
-      updateMap();
+      // if not already the last layer
+      if ( $scope.currentId < (MapService.layers.length - 2) ) {
+        // stores currentId as previousId
+        $scope.prevId = $scope.currentId;
+        // move to the end of the array
+        $scope.currentId = (MapService.layers.length - 2) ;
+        // updates map rotation, center, visibility, and zoom settings 
+        updateMap();
+      }
 
     };
 
@@ -346,12 +374,15 @@ angular
     // Used by the ng-click directive on the start button on the map player controls.
     this.startOption = function() {
 
-      // stores currentId as previousId
-      $scope.prevId = $scope.currentId;
-      // move to the beginning of the array
-      $scope.currentId = MapService.currentImages[0];
-      // updates map rotation, center, visibility, and zoom settings 
-      updateMap();
+      // if not already the first layer
+      if ( $scope.currentId >= 1 ) {
+        // stores currentId as previousId
+        $scope.prevId = $scope.currentId;
+        // move to the beginning of the array
+        $scope.currentId = 0;
+        // updates map rotation, center, visibility, and zoom settings 
+        updateMap();
+      }
 
     };
 
@@ -365,6 +396,16 @@ angular
       this.mapAnimation();
     };
 
+    // Function used to play through the map layers.
+    // Used by the playOption function.
+    this.mapAnimation = function() {
+        var this_ = this;
+        // calls the forwardOption function at defined intervals defined by the users settings
+        animationRunner = $interval(function() {
+            this_.forwardOption();
+        }, $scope.data.updateInterval);
+    };
+
     // Function that will stop the animation of the map layers.
     // Used by the ng-click directive on the stop button on the map player controls.
     this.stopOption = function() {
@@ -376,13 +417,20 @@ angular
       if (angular.isDefined(animationRunner)) {
             $interval.cancel(animationRunner);
             animationRunner = undefined;
-        }
+      }
 
     }
 
     // Function used to toggle sidenavs.
-    this.toggle = function(navID) {
-      $mdSidenav(navID).toggle();
+    this.toggle = function(navId) {
+      $.each($scope.obj, function(key, value) { 
+          if ( value == true && navId != key ) {
+              $mdSidenav(key).toggle();
+              $scope.obj[key] = false 
+          }
+        });
+      $mdSidenav(navId).toggle();
+      $scope.obj[navId] = !$scope.obj[navId];
     };
 
     // Function used to call the introjs help tutorial for the main app.

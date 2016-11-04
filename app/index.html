@@ -104,7 +104,7 @@
       <md-content id="content">
 
         <!-- SideNav for Help Options -->
-        <md-sidenav md-component-id="helpnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
+        <md-sidenav md-component-id="helpnav" class="md-sidenav-right md-whiteframe-z2 md-closed" md-disable-backdrop="true" >
 
           <md-toolbar layout="row" class="controlsToolbar">
             <h1 class="sidenav-title">Help Options</h1>
@@ -140,10 +140,13 @@
         </md-sidenav>
 
         <!-- SideNav for Settings Options -->
-        <md-sidenav md-component-id="settingsnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
+        <md-sidenav md-component-id="settingsnav" class="md-sidenav-right md-whiteframe-z2 md-closed" md-disable-backdrop="true" >
 
           <md-toolbar layout="row" class="controlsToolbar">
             <h1 class="sidenav-title">Application Settings</h1>
+            <md-button class="md-icon-button sidenav-menuButton" ng-click="ctrl.settingsHelp()" aria-label="Show settings List" style="margin-right: 0px; margin-left: auto;">
+              <md-icon md-svg-icon="help" ></md-icon>
+            </md-button>
           </md-toolbar>
         
           <md-content layout-padding>
@@ -172,11 +175,11 @@
         </md-sidenav>
 
         <!-- SideNav for Filter Options -->
-        <md-sidenav md-component-id="filternav" layout="column" layout-fill md-is-locked-open="sideNavOpen" class="filternav md-sidenav-left md-whiteframe-z2" md-disable-backdrop="true">
+        <md-sidenav md-component-id="filternav" layout="column" layout-fill class="filternav md-sidenav-left md-whiteframe-z2" md-disable-backdrop="true" >
           
           <md-toolbar layout="row" class="controlsToolbar">
             <h1 class="sidenav-title">Filter Options</h1>
-            <md-button class="menuButton" ng-click="ctrl.filterHelp()" aria-label="Show filter List" style="margin-right: 0px; margin-left: auto;">
+            <md-button class="md-icon-button sidenav-menuButton" ng-click="ctrl.filterHelp()" aria-label="Show filter List" style="margin-right: 0px; margin-left: auto;">
               <md-icon md-svg-icon="help" ></md-icon>
             </md-button>
           </md-toolbar>
@@ -258,12 +261,12 @@
         </md-sidenav>
 
         <!-- SideNav for Algorithm Options -->
-        <md-sidenav md-component-id="algonav" class="md-sidenav-left md-whiteframe-z2 md-closed" >
+        <md-sidenav md-component-id="algonav" class="md-sidenav-left md-whiteframe-z2 md-closed" md-disable-backdrop="true" >
           
           <!-- Container #5 - top row of Container #3 -->
           <md-toolbar layout="row" class="controlsToolbar">
             <h1 class="sidenav-title">Algorithms</h1>
-            <md-button class="algoButton menuButton" ng-click="ctrl.algoHelp()" aria-label="Show Algorithm List" style="margin-right: 0px; margin-left: auto;">
+            <md-button class="md-icon-button sidenav-menuButton" ng-click="ctrl.algoHelp()" aria-label="Show Algorithm List" style="margin-right: 0px; margin-left: auto;">
               <md-icon md-svg-icon="help" ></md-icon>
             </md-button>
           </md-toolbar>
@@ -317,12 +320,15 @@
         </md-sidenav>
 
         <!-- SideNav for Phenomenology List -->
-        <md-sidenav md-component-id="phenomnav" class="md-sidenav-right md-whiteframe-z2 md-closed">
+        <md-sidenav md-component-id="phenomnav" class="md-sidenav-right md-whiteframe-z2 md-closed" md-disable-backdrop="true" >
           
           <md-toolbar layout="row" class="controlsToolbar">
             <h1 class="sidenav-title">About</h1>
-            <md-button class="menuButton" ng-click="ctrl.toggle('phenomnav')" aria-label="Show Phenomenology Examples List" style="margin-right: 0px; margin-left: auto;">
+            <md-button class="md-icon-button sidenav-menuButton" ng-click="ctrl.toggle('phenomnav')" aria-label="Show Phenomenology Examples List" style="margin-right: 0px; margin-left: auto;">
               <md-icon md-svg-icon="help" ></md-icon>
+            </md-button>
+            <md-button class="md-icon-button sidenav-menuButton" ng-click="ctrl.toggle('phenomnav')" aria-label="Close the phenom sidenav" style="margin-right: 0px; margin-left: auto;">
+              <md-icon md-svg-icon="rightarrow" ></md-icon>
             </md-button>
           </md-toolbar>
 
@@ -361,10 +367,13 @@
         </md-sidenav>
 
         <!-- SideNav for Info List -->
-        <md-sidenav md-component-id="infonav" class="infonav md-sidenav-right md-whiteframe-z2 md-closed">
+        <md-sidenav md-component-id="infonav" class="infonav md-sidenav-right md-whiteframe-z2 md-closed" md-disable-backdrop="true" >
           
           <md-toolbar layout="row" class="controlsToolbar">
             <h1 class="sidenav-title">About</h1>
+            <md-button class="md-icon-button sidenav-menuButton" ng-click="ctrl.toggle('infonav')" aria-label="Close the info sidenav" style="margin-right: 0px; margin-left: auto;">
+              <md-icon md-svg-icon="rightarrow" ></md-icon>
+            </md-button>
           </md-toolbar>
 
           <md-content>
@@ -466,9 +475,9 @@
         <div class="timeLine" hide-md hide-sm hide-xs flex="33" layout="row" layout-align="center center">
 
           <div id="horizontal-container" >
-            <md-button ng-class="selectedGetClass(item)" ng-right-click="rightClick(item)" class="md-fab md-mini md-primary timeLineButtons" ng-repeat="item in getImages()" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item)" aria-label="Image Button {{item}}" value="{{item}}">
+            <md-button ng-class="selectedGetClass(item.id, item.playerId)" ng-right-click="rightClick(item.playerId)" class="md-fab md-mini md-primary timeLineButtons" ng-repeat="item in getImages()" ng-disabled="playStatus" ng-click="ctrl.gotoImage(item.id)" aria-label="Image Button {{item.playerId}}" value="{{item.playerId}}">
               <!-- <md-icon class="material-icons" ng-if="movieCheck(item)" md-svg-icon="close" style="padding-right: 10px;"></md-icon> -->
-              {{ item }}
+              {{ item.playerId }}
             </md-button>
           </div>
 

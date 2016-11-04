@@ -6,13 +6,18 @@ angular
         this.layers = [];
         this.proj = null;
         this.baseURL = 'http://127.0.0.1:8888/';
-        this.currentImages = [];
+        this.currentLayers = [];
         this.zoomLevel = DefaultConfigs.optionDefaults.zoom;
         this.currentZoomLevel = this.zoomLevel;
         this.centerValue = [DefaultConfigs.optionDefaults.x, DefaultConfigs.optionDefaults.y];
         this.currentCenterValue = this.centerValue;
         this.currentRotationValue = 0;
         this.tileAttribution = new ol.Attribution({ html: '<img src="./assets/images/af.png"> <img src="./assets/images/nasic.png">'});
+
+        function l(id, playerId) {
+            this.id = id;
+            this.playerId = playerId;
+        }
 
         function copyToClipboard(data) {
             angular.element('<textarea/>')
@@ -34,8 +39,7 @@ angular
         };
 
         // creates a map layer
-        this.createLayer = function(ind, isVisible=false) {
-            console.log('The createLayer ind is: ' + ind);
+        this.createLayer = function(ind, isVisible=false, counter=1) {
             imageLayer = new ol.layer.Tile({
                 preload: Infinity,
                 source: new ol.source.XYZ({
@@ -47,7 +51,9 @@ angular
                 transitionEffect: 'resize',
                 visible: isVisible
             });
+            imageLayer.id = counter;
             imageLayer.playerId = parseInt(ind, 10);
+
             return imageLayer;
         };
 
@@ -55,12 +61,15 @@ angular
         this.buildLayers = function() {
             var urlSettings = $location.search();
             var temp = null;
-            this.currentImages = [];
+            var counter = -1;
+            this.currentLayers = [];
             
             for (i = parseInt(urlSettings.start, 10); i < (parseInt(urlSettings.end, 10)+1); i++) {
                 console.log('i is: ' + i);
-                this.currentImages.push(i);
-                temp = this.createLayer(ind=i, isVisible=false);
+                counter = counter + 1;
+                var temp = new l(counter, i);
+                this.currentLayers.push(temp);
+                temp = this.createLayer(ind=i, isVisible=false, counter=counter);
                 this.layers.push(temp);
             }
 
@@ -104,7 +113,7 @@ angular
             this.createProjection();
             this.buildLayers();
 
-            if (this.currentImages.length != 0) {
+            if (this.currentLayers.length != 0) {
                 // create control for adding mouse coordinates to the map
                 var mousePositionControl = new ol.control.MousePosition({
                     coordinateFormat: ol.coordinate.createStringXY(4),

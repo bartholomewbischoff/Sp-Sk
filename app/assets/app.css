@@ -64,6 +64,11 @@ md-toast {
   margin-bottom: auto;
 }
 
+.sidenav-menuButton {
+  margin-top: 1% !important;
+  margin-bottom: 49% !important;
+}
+
 .sensorControls, .timeControls, .timeBackControls {
   padding-bottom: 40px;
   border-bottom: 2px solid rgb(189,189,189);
@@ -157,7 +162,7 @@ md-sidenav  md-list {
 }
 
 .infonav {
-  width: 390px;
+  /*width: 390px;*/
 }
 
 .sidenav-title {
@@ -187,6 +192,8 @@ md-sidenav  md-list {
 
 #content {
   height: 100%;
+  overflow: hidden;
+  background-color: black;
 }
 
 #content .md-button.share {
